@@ -1,8 +1,15 @@
-import { NestFactory } from '@nestjs/core'; // 1
-import { AppModule } from './app.module.js'; // 2
-
-async function bootstrap() { // 3
-  const app = await NestFactory.create(AppModule); // 4
-  await app.listen(process.env.PORT ?? 5500); // 5
+import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module.js';
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+  await app.listen(process.env.PORT ?? 5500);
 }
-bootstrap(); // 6
+bootstrap();
