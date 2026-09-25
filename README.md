@@ -106,6 +106,26 @@ src/
 │   ├── scholarships.service.ts
 │   └── scholarships.module.ts
 │
+├── applications/
+│   ├── dto/
+│   │   ├── create-application.dto.ts
+│   │   └── update-application.dto.ts
+│   ├── pipes/
+│   │   └── parse-application-id.pipe.ts
+│   ├── applications.controller.ts
+│   ├── applications.service.ts
+│   └── applications.module.ts
+│
+├── documents/
+│   ├── dto/
+│   │   ├── create-document.dto.ts
+│   │   └── update-document.dto.ts
+│   ├── pipes/
+│   │   └── parse-document-id.pipe.ts
+│   ├── documents.controller.ts
+│   ├── documents.service.ts
+│   └── documents.module.ts
+│
 ├── app.module.ts
 ├── app.controller.ts
 ├── app.service.ts
@@ -193,6 +213,106 @@ isActive
 El módulo utiliza DTOs con `class-validator` y un pipe personalizado para validar los IDs.
 
 Las actualizaciones utilizan `PartialType`, permitiendo modificar únicamente los campos necesarios.
+
+---
+
+## Applications
+
+El módulo `applications` permite registrar y administrar las solicitudes de beca de cada estudiante.
+
+### Datos de la solicitud
+
+```text
+id
+studentId
+scholarshipId
+gpa
+income
+comment
+status
+```
+
+### Endpoints
+
+| Método | Endpoint                                     | Descripción                                     |
+| ------ | -------------------------------------------- | ----------------------------------------------- |
+| GET    | `/applications`                              | Obtener todas las solicitudes                   |
+| GET    | `/applications/:id`                          | Obtener una solicitud por ID                    |
+| GET    | `/applications/student/:studentId`           | Obtener solicitudes por estudiante              |
+| GET    | `/applications/scholarship/:scholarshipId`  | Obtener solicitudes por beca                   |
+| POST   | `/applications`                              | Crear una solicitud                             |
+| PATCH  | `/applications/:id`                          | Actualizar campos generales                     |
+| PATCH  | `/applications/:id/status`                   | Cambiar el estado de la solicitud               |
+| DELETE | `/applications/:id`                          | Eliminar una solicitud                          |
+
+### Estados
+
+Las solicitudes cuentan con estados que permiten controlar el avance del proceso:
+
+* `pendiente`
+* `revision`
+* `aprobada`
+* `rechazada`
+* `correccion`
+
+### Validaciones
+
+El DTO `CreateApplicationDto` valida:
+
+* `studentId` obligatorio y entero positivo.
+* `scholarshipId` obligatorio y entero positivo.
+* `gpa` numérico y mayor o igual a 0.
+* `income` numérico y mayor o igual a 0.
+* `comment` opcional y de tipo texto.
+
+Además, la ruta incluye un pipe personalizado que rechaza IDs no válidos con un `400 Bad Request`.
+
+---
+
+## Documents
+
+El módulo `documents` permite gestionar los archivos y comprobantes asociados a una solicitud de beca.
+
+### Datos del documento
+
+```text
+id
+applicationId
+name
+url
+status
+```
+
+### Endpoints
+
+| Método | Endpoint                                 | Descripción                              |
+| ------ | ---------------------------------------- | ---------------------------------------- |
+| GET    | `/documents`                             | Obtener todos los documentos             |
+| GET    | `/documents/:id`                         | Obtener un documento por ID              |
+| GET    | `/documents/application/:applicationId` | Obtener documentos por solicitud         |
+| POST   | `/documents`                             | Crear un documento                       |
+| PATCH  | `/documents/:id`                         | Actualizar nombre o URL                  |
+| PATCH  | `/documents/:id/status`                  | Cambiar el estado del documento          |
+| DELETE | `/documents/:id`                         | Eliminar un documento                    |
+
+### Estados
+
+Los documentos tienen los siguientes estados:
+
+* `pendiente`
+* `cargado`
+* `observado`
+* `aprobado`
+
+### Validaciones
+
+El DTO `CreateDocumentDto` valida:
+
+* `applicationId` obligatorio y entero positivo.
+* `name` obligatorio y de tipo texto.
+* `url` opcional y de tipo texto.
+
+También se usa un pipe personalizado para validar los IDs de documento.
 
 ---
 
