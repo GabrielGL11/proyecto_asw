@@ -126,6 +126,16 @@ src/
 │   ├── documents.service.ts
 │   └── documents.module.ts
 │
+├── tracking/
+│   ├── dto/
+│   │   ├── create-tracking.dto.ts
+│   │   └── update-tracking.dto.ts
+│   ├── pipes/
+│   │   └── parse-tracking-id.pipe.ts
+│   ├── tracking.controller.ts
+│   ├── tracking.service.ts
+│   └── tracking.module.ts
+│
 ├── app.module.ts
 ├── app.controller.ts
 ├── app.service.ts
@@ -316,6 +326,53 @@ También se usa un pipe personalizado para validar los IDs de documento.
 
 ---
 
+## Tracking
+
+El módulo `tracking` permite registrar el historial de seguimiento de cada solicitud de beca, guardando los cambios de estado a lo largo del proceso.
+
+### Datos del seguimiento
+
+```text
+id
+applicationId
+status
+comment
+createdAt
+```
+
+### Endpoints
+
+| Método | Endpoint                              | Descripción                               |
+| ------ | ------------------------------------- | ----------------------------------------- |
+| GET    | `/tracking`                           | Obtener todos los registros de seguimiento |
+| GET    | `/tracking/:id`                       | Obtener un registro por ID                |
+| GET    | `/tracking/application/:applicationId` | Obtener el historial de una solicitud     |
+| POST   | `/tracking`                           | Crear un registro de seguimiento          |
+| PATCH  | `/tracking/:id`                       | Actualizar un registro de seguimiento     |
+| DELETE | `/tracking/:id`                       | Eliminar un registro de seguimiento       |
+
+### Estados
+
+Los registros de seguimiento admiten los siguientes estados:
+
+* `pendiente`
+* `revision`
+* `aprobada`
+* `rechazada`
+* `correccion`
+
+### Validaciones
+
+El DTO `CreateTrackingDto` valida:
+
+* `applicationId` obligatorio, entero y positivo.
+* `status` obligatorio y limitado a los estados permitidos.
+* `comment` opcional, de tipo texto y no vacío cuando se proporciona.
+
+Las rutas que reciben un ID de seguimiento utilizan `ParseTrackingIdPipe` para validar que sea un entero positivo. El parámetro `applicationId` del historial se convierte y valida con `ParseIntPipe`.
+
+---
+
 # Validación global
 
 El proyecto utiliza un `ValidationPipe` global configurado en `main.ts`:
@@ -501,12 +558,15 @@ Actualmente se encuentran implementados:
 * [x] DTOs de `students`.
 * [x] Validaciones de `students`.
 * [x] Pipe para validar IDs de `students`.
+* [x] Módulo `tracking`.
+* [x] CRUD de `tracking`.
+* [x] DTOs y validaciones de `tracking`.
+* [x] Pipe para validar IDs de `tracking`.
 
 Pendiente:
 
 * [ ] Módulo `applications`.
 * [ ] Módulo `documents`.
-* [ ] Módulo `tracking`.
 * [ ] Persistencia con PostgreSQL.
 * [ ] Integración con TypeORM.
 * [ ] Variables de entorno para la conexión a la base de datos.
