@@ -1,13 +1,17 @@
 <p align="center">
+
   <a href="https://nestjs.com/" target="_blank">
     <img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" />
   </a>
+
 </p>
 
 <h1 align="center">Sistema de Gestión de Becas ULEAM</h1>
 
 <p align="center">
-  Backend desarrollado con <strong>NestJS + TypeScript</strong> para la gestión de becas estudiantiles de la Universidad Laica Eloy Alfaro de Manabí (ULEAM).
+
+Backend desarrollado con <strong>NestJS + TypeScript</strong> para la gestión de becas estudiantiles de la Universidad Laica Eloy Alfaro de Manabí (ULEAM).
+
 </p>
 
 ---
@@ -69,9 +73,9 @@ Application
 
 Actualmente se ha configurado la conexión de desarrollo con **PostgreSQL + TypeORM** mediante variables de entorno.
 
-La configuración de la conexión ya está preparada, pero los servicios de los módulos todavía utilizan almacenamiento en memoria.
+El módulo **`scholarships`** ya cuenta con una entidad de TypeORM, una tabla en PostgreSQL y persistencia mediante `Repository`.
 
-La sustitución de los arreglos temporales por repositorios TypeORM corresponde al siguiente paso del proyecto.
+Los demás módulos mantienen actualmente su implementación original mientras se realiza progresivamente la migración hacia persistencia con TypeORM.
 
 ---
 
@@ -83,23 +87,31 @@ Cada recurso cuenta con su propio módulo y separa las responsabilidades princip
 
 ```text
 Module
+
 ├── Controller
+
 ├── Service
+
 ├── DTO
-└── Pipes
+
+├── Pipes
+
+└── Entity
 ```
 
 El **Controller** recibe las solicitudes HTTP.
 
-El **Service** contiene la lógica de negocio y actualmente gestiona los datos almacenados temporalmente en memoria.
+El **Service** contiene la lógica de negocio.
 
 Los **DTOs** definen y validan los datos recibidos.
 
 Los **Pipes** permiten validar parámetros como los identificadores.
 
-### Arquitectura prevista para la persistencia
+Las **Entities** representan las estructuras de datos que serán persistidas mediante TypeORM.
 
-Con la integración de TypeORM, el flujo será:
+### Arquitectura de persistencia
+
+Para el módulo `scholarships`, el flujo actual es:
 
 ```text
 Controller
@@ -113,7 +125,7 @@ TypeORM
 PostgreSQL
 ```
 
-El objetivo es cambiar el mecanismo interno de almacenamiento sin modificar el contrato HTTP de los endpoints existentes.
+El servicio de `scholarships` utiliza `Repository<Scholarship>` para realizar las operaciones de consulta, creación, actualización y eliminación de registros.
 
 ---
 
@@ -125,8 +137,11 @@ El proyecto utiliza una instancia local de PostgreSQL para el desarrollo.
 
 ```text
 Nombre: SG_Becas_ULEAM
+
 Host: localhost
+
 Puerto: 5432
+
 Usuario: postgres
 ```
 
@@ -246,6 +261,8 @@ src/
 │   ├── dto/
 │   │   ├── create-scholarship.dto.ts
 │   │   └── update-scholarship.dto.ts
+│   ├── entities/
+│   │   └── scholarship.entity.ts
 │   ├── pipes/
 │   │   └── parse-scholarship-id.pipe.ts
 │   ├── scholarships.controller.ts
@@ -278,7 +295,7 @@ src/
 └── main.ts
 ```
 
-> Las carpetas `entities/` se agregarán durante la siguiente etapa de configuración de persistencia.
+La entidad `scholarship.entity.ts` representa actualmente el modelo persistente de las becas.
 
 ---
 
@@ -292,13 +309,21 @@ El módulo `students` permite gestionar los estudiantes que pueden solicitar una
 
 ```text
 id
+
 firstName
+
 lastName
+
 nationalId
+
 email
+
 age
+
 career
+
 semester
+
 isActive
 ```
 
@@ -340,13 +365,52 @@ El módulo `scholarships` permite gestionar las becas disponibles.
 
 ```text
 id
+
 name
+
 description
+
 amount
+
 startDate
+
 endDate
+
 isActive
 ```
+
+### Persistencia
+
+El módulo utiliza actualmente **TypeORM + PostgreSQL**.
+
+La entidad se encuentra en:
+
+```text
+src/scholarships/entities/scholarship.entity.ts
+```
+
+La entidad utiliza:
+
+```ts
+@Entity('scholarships')
+```
+
+para representar la tabla `scholarships` en PostgreSQL.
+
+El módulo registra la entidad mediante:
+
+```ts
+TypeOrmModule.forFeature([Scholarship])
+```
+
+El servicio utiliza un repositorio de TypeORM:
+
+```ts
+@InjectRepository(Scholarship)
+private readonly scholarshipsRepository: Repository<Scholarship>
+```
+
+Las operaciones CRUD se realizan directamente sobre PostgreSQL mediante este repositorio.
 
 ### Endpoints
 
@@ -364,6 +428,19 @@ El módulo utiliza DTOs con `class-validator` y un pipe personalizado para valid
 
 Las actualizaciones utilizan `PartialType`.
 
+### Persistencia verificada
+
+Se realizaron pruebas mediante Thunder Client para verificar:
+
+* Consulta de becas.
+* Creación de becas.
+* Consulta por ID.
+* Actualización de becas.
+* Eliminación de becas.
+* Persistencia de los registros en PostgreSQL.
+
+Los registros creados mediante `POST /scholarships` fueron almacenados en la tabla `scholarships`.
+
 ---
 
 # Applications
@@ -374,11 +451,17 @@ El módulo `applications` permite registrar y administrar las solicitudes de bec
 
 ```text
 id
+
 studentId
+
 scholarshipId
+
 gpa
+
 income
+
 comment
+
 status
 ```
 
@@ -442,9 +525,13 @@ El módulo `documents` permite gestionar los documentos asociados a una solicitu
 
 ```text
 id
+
 applicationId
+
 name
+
 url
+
 status
 ```
 
@@ -502,9 +589,13 @@ Cada registro permite conocer el estado de una solicitud y almacenar un comentar
 
 ```text
 id
+
 applicationId
+
 status
+
 comment
+
 createdAt
 ```
 
@@ -672,6 +763,58 @@ http://localhost:5500
 
 Las pruebas manuales de la API se realizan mediante **Thunder Client** en Visual Studio Code.
 
+## Scholarships
+
+### Obtener becas
+
+```http
+GET http://localhost:5500/scholarships
+```
+
+### Obtener una beca
+
+```http
+GET http://localhost:5500/scholarships/1
+```
+
+### Crear una beca
+
+```http
+POST http://localhost:5500/scholarships
+Content-Type: application/json
+```
+
+```json
+{
+  "name": "Beca Socioeconómica",
+  "description": "Apoyo económico para estudiantes.",
+  "amount": 500,
+  "startDate": "2026-10-01",
+  "endDate": "2026-12-31",
+  "isActive": true
+}
+```
+
+### Actualizar una beca
+
+```http
+PATCH http://localhost:5500/scholarships/2
+Content-Type: application/json
+```
+
+```json
+{
+  "amount": 900,
+  "isActive": false
+}
+```
+
+### Eliminar una beca
+
+```http
+DELETE http://localhost:5500/scholarships/2
+```
+
 ## Applications
 
 ### Obtener solicitudes
@@ -838,41 +981,72 @@ DELETE http://localhost:5500/tracking/3
 
 Durante las pruebas con Thunder Client se verificaron casos de éxito y error en los diferentes módulos.
 
+## Scholarships
+
+```text
+GET /scholarships       → 200 OK
+GET /scholarships/1    → 200 OK
+POST /scholarships     → 201 Created
+PATCH /scholarships/2  → 200 OK
+DELETE /scholarships/2 → 200 OK
+```
+
+También se verificó que los registros creados y actualizados mediante la API fueran almacenados correctamente en PostgreSQL.
+
 ## Applications
 
 ```text
 GET /applications                 → 200 OK
-GET /applications/1               → 200 OK
-POST /applications                → 201 Created
-PATCH /applications/4             → 200 OK
-DELETE /applications/4            → 200 OK
-GET /applications/4               → 404 Not Found
-GET /applications/a               → 400 Bad Request
-POST con datos inválidos          → 400 Bad Request
+
+GET /applications/1              → 200 OK
+
+POST /applications               → 201 Created
+
+PATCH /applications/4            → 200 OK
+
+DELETE /applications/4           → 200 OK
+
+GET /applications/4             → 404 Not Found
+
+GET /applications/a             → 400 Bad Request
+
+POST con datos inválidos         → 400 Bad Request
 ```
 
 ## Documents
 
 ```text
-GET /documents                    → 200 OK
-POST /documents                   → 201 Created
-PATCH /documents/2                → 200 OK
-DELETE /documents/2               → 200 OK
-GET /documents/2                  → 404 Not Found
-GET /documents/a                  → 400 Bad Request
-POST con datos inválidos          → 400 Bad Request
+GET /documents                   → 200 OK
+
+POST /documents                  → 201 Created
+
+PATCH /documents/2               → 200 OK
+
+DELETE /documents/2              → 200 OK
+
+GET /documents/2                 → 404 Not Found
+
+GET /documents/a                 → 400 Bad Request
+
+POST con datos inválidos         → 400 Bad Request
 ```
 
 ## Tracking
 
 ```text
-GET /tracking                     → 200 OK
-GET /tracking/2                   → 200 OK
-POST /tracking                    → 201 Created
-PATCH /tracking/2                 → 200 OK
-PATCH /tracking/2                 → 200 OK
-DELETE /tracking/3                → 200 OK
-DELETE /tracking/999              → 404 Not Found
+GET /tracking                    → 200 OK
+
+GET /tracking/2                  → 200 OK
+
+POST /tracking                   → 201 Created
+
+PATCH /tracking/2                → 200 OK
+
+PATCH /tracking/2                → 200 OK
+
+DELETE /tracking/3               → 200 OK
+
+DELETE /tracking/999             → 404 Not Found
 ```
 
 ### Validaciones de Tracking
@@ -880,11 +1054,15 @@ DELETE /tracking/999              → 404 Not Found
 Durante las pruebas también se verificaron:
 
 ```text
-PATCH con status inválido         → 400 Bad Request
-PATCH con applicationId: 0        → 400 Bad Request
-PATCH con applicationId: "abc"    → 400 Bad Request
-PATCH con comment vacío           → 400 Bad Request
-PATCH con propiedad no permitida  → 400 Bad Request
+PATCH con status inválido        → 400 Bad Request
+
+PATCH con applicationId: 0       → 400 Bad Request
+
+PATCH con applicationId: "abc"   → 400 Bad Request
+
+PATCH con comment vacío          → 400 Bad Request
+
+PATCH con propiedad no permitida → 400 Bad Request
 ```
 
 ### Ejemplo de estado inválido
@@ -1019,16 +1197,21 @@ Actualmente se encuentran implementados:
 * [x] Configuración de `ConfigModule`.
 * [x] Configuración inicial de `TypeOrmModule`.
 * [x] Compilación exitosa del proyecto con TypeORM.
+* [x] Entidad TypeORM de `scholarships`.
+* [x] Registro de `Scholarship` mediante `TypeOrmModule.forFeature`.
+* [x] Creación de la tabla `scholarships` mediante TypeORM.
+* [x] Persistencia de `scholarships` mediante `Repository`.
+* [x] CRUD de `scholarships` conectado a PostgreSQL.
+* [x] Verificación de registros mediante PostgreSQL.
 
 ### Pendiente
 
-* [ ] Crear las entidades de TypeORM.
-* [ ] Registrar las entidades en los módulos.
-* [ ] Crear las tablas mediante TypeORM.
-* [ ] Verificar completamente la conexión con PostgreSQL.
-* [ ] Migrar los servicios desde almacenamiento en memoria hacia repositorios TypeORM.
+* [ ] Crear las entidades TypeORM de los demás módulos.
+* [ ] Registrar las entidades restantes en sus módulos.
+* [ ] Crear las tablas restantes mediante TypeORM.
+* [ ] Migrar los servicios restantes desde almacenamiento en memoria hacia repositorios TypeORM.
 * [ ] Definir las relaciones entre entidades.
-* [ ] Verificar la persistencia de los datos después de reiniciar la aplicación.
+* [ ] Verificar la persistencia de los demás módulos después de reiniciar la aplicación.
 * [ ] Realizar pruebas de integración con la base de datos.
 * [ ] Completar la documentación final de evidencias.
 
@@ -1036,11 +1219,11 @@ Actualmente se encuentran implementados:
 
 # Próximos pasos
 
-1. Crear las entidades TypeORM para los cinco módulos.
+1. Crear las entidades TypeORM para los módulos restantes.
 2. Registrar las entidades mediante `TypeOrmModule.forFeature`.
-3. Iniciar la aplicación y verificar la conexión con PostgreSQL.
-4. Comprobar la creación de las tablas en `SG_Becas_ULEAM`.
-5. Sustituir los arreglos temporales por repositorios TypeORM.
+3. Crear las tablas correspondientes mediante TypeORM.
+4. Sustituir los arreglos temporales de los módulos restantes por repositorios TypeORM.
+5. Definir las relaciones entre entidades.
 6. Mantener el mismo contrato HTTP de los endpoints.
 7. Verificar la persistencia después de reiniciar la aplicación.
 8. Realizar pruebas de integración.

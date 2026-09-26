@@ -1,62 +1,44 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateScholarshipDto } from './dto/create-scholarship.dto.js';
 import { UpdateScholarshipDto } from './dto/update-scholarship.dto.js';
-
-type Scholarship = {
-    id: number;
-    name: string;
-    description: string;
-    amount: number;
-    startDate: string;
-    endDate: string;
-    isActive: boolean;
-};
+import { Scholarship } from './entities/scholarship.entity.js';
 @Injectable()
 export class ScholarshipsService {
-    private readonly scholarships: Scholarship[] = [
-    {
-        id: 1,
-        name: 'Beca Socioeconómica',
-        description: 'Apoyo económico para estudiantes.',
-        amount: 500,
-        startDate: '2026-10-01',
-        endDate: '2026-12-31',
-        isActive: true,
-    },
-    ];
+    constructor(
+        @InjectRepository(Scholarship)
+        private readonly scholarshipsRepository: Repository<Scholarship>,
+    ) {}
     findAll() {
-    return this.scholarships;
+        return this.scholarshipsRepository.find();
     }
-    findOne(id: number) {
-    const scholarship = this.scholarships.find(
-        (scholarship) => scholarship.id === id,
-    );
-    if (!scholarship) {
+    async findOne(id: number) {
+        const scholarship = await this.scholarshipsRepository.findOneBy({
+        id,
+        });
+        if (!scholarship) {
         throw new NotFoundException('Beca no encontrada');
+        }
+        return scholarship;
     }
-    return scholarship;
+    async create(createScholarshipDto: CreateScholarshipDto) {
+        const scholarship = this.scholarshipsRepository.create(
+        createScholarshipDto,
+        );
+        return this.scholarshipsRepository.save(scholarship);
     }
-    create(createScholarshipDto: CreateScholarshipDto) {
-    const newScholarship: Scholarship = {
-        id: this.scholarships.length + 1,
-        ...createScholarshipDto,
-    };
-    this.scholarships.push(newScholarship);
-    return newScholarship;
+    async update(
+        id: number,
+        updateScholarshipDto: UpdateScholarshipDto,
+    ) {
+        const scholarship = await this.findOne(id);
+        Object.assign(scholarship, updateScholarshipDto);
+        return this.scholarshipsRepository.save(scholarship);
     }
-    update(id: number, updateScholarshipDto: UpdateScholarshipDto) {
-    const scholarship = this.findOne(id);
-    Object.assign(scholarship, updateScholarshipDto);
-    return scholarship;
-    }
-    remove(id: number) {
-    const index = this.scholarships.findIndex(
-        (scholarship) => scholarship.id === id,
-    );
-    if (index === -1) {
-        throw new NotFoundException('Beca no encontrada');
-    }
-    const deletedScholarship = this.scholarships.splice(index, 1);
-    return deletedScholarship[0];
+    async remove(id: number) {
+        const scholarship = await this.findOne(id);
+        await this.scholarshipsRepository.remove(scholarship);
+        return scholarship;
     }
 }
