@@ -1,47 +1,31 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Document, DocumentStatus } from './entities/document.entity.js';
 import { CreateDocumentDto } from './dto/create-document.dto.js';
 import { UpdateDocumentDto } from './dto/update-document.dto.js';
 
-type DocumentStatus = 'pendiente' | 'cargado' | 'observado' | 'aprobado';
-
-type Document = {
-  id: number;
-  applicationId: number;
-  name: string;
-  url?: string;
-  status: DocumentStatus;
-};
-
 @Injectable()
 export class DocumentsService {
-  private readonly documents: Document[] = [
-    {
-      id: 1,
-      applicationId: 1,
-      name: 'Carta de recomendación',
-      url: 'https://example.com/recomendacion.pdf',
-      status: 'pendiente',
-    },
-  ];
+  constructor(
+    @InjectRepository(Document)
+    private readonly documentsRepository: Repository<Document>,
+  ) {}
 
   create(createDocumentDto: CreateDocumentDto) {
-    const nextId = this.documents.length > 0 ? this.documents[this.documents.length - 1].id + 1 : 1;
-    const newDocument: Document = {
-      id: nextId,
+    const document = this.documentsRepository.create({
       ...createDocumentDto,
       status: 'pendiente',
-    };
-
-    this.documents.push(newDocument);
-    return newDocument;
+    });
+    return this.documentsRepository.save(document);
   }
 
   findAll() {
-    return this.documents;
+    return this.documentsRepository.find();
   }
 
-  findOne(id: number) {
-    const document = this.documents.find((item) => item.id === id);
+  async findOne(id: number) {
+    const document = await this.documentsRepository.findOneBy({ id });
 
     if (!document) {
       throw new NotFoundException('Documento no encontrado');
@@ -50,30 +34,24 @@ export class DocumentsService {
     return document;
   }
 
-  update(id: number, updateDocumentDto: UpdateDocumentDto) {
-    const document = this.findOne(id);
+  async update(id: number, updateDocumentDto: UpdateDocumentDto) {
+    const document = await this.findOne(id);
     Object.assign(document, updateDocumentDto);
-    return document;
+    return this.documentsRepository.save(document);
   }
 
-  remove(id: number) {
-    const index = this.documents.findIndex((document) => document.id === id);
-
-    if (index === -1) {
-      throw new NotFoundException('Documento no encontrado');
-    }
-
-    const [deletedDocument] = this.documents.splice(index, 1);
-    return deletedDocument;
+  async remove(id: number) {
+    const document = await this.findOne(id);
+    return this.documentsRepository.remove(document);
   }
 
   findByApplication(applicationId: number) {
-    return this.documents.filter((document) => document.applicationId === applicationId);
+    return this.documentsRepository.findBy({ applicationId });
   }
 
-  updateStatus(id: number, status: DocumentStatus) {
-    const document = this.findOne(id);
+  async updateStatus(id: number, status: DocumentStatus) {
+    const document = await this.findOne(id);
     document.status = status;
-    return document;
+    return this.documentsRepository.save(document);
   }
 }

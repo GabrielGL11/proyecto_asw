@@ -1,51 +1,31 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Application, ApplicationStatus } from './entities/application.entity.js';
 import { CreateApplicationDto } from './dto/create-application.dto.js';
 import { UpdateApplicationDto } from './dto/update-application.dto.js';
 
-type ApplicationStatus = 'pendiente' | 'revision' | 'aprobada' | 'rechazada' | 'correccion';
-
-type Application = {
-  id: number;
-  studentId: number;
-  scholarshipId: number;
-  gpa: number;
-  income: number;
-  comment?: string;
-  status: ApplicationStatus;
-};
-
 @Injectable()
 export class ApplicationsService {
-  private readonly applications: Application[] = [
-    {
-      id: 1,
-      studentId: 2,
-      scholarshipId: 2,
-      gpa: 8.6,
-      income: 1200,
-      comment: 'Solicitante con rendimiento académico bueno.',
-      status: 'pendiente',
-    },
-  ];
+  constructor(
+    @InjectRepository(Application)
+    private readonly applicationsRepository: Repository<Application>,
+  ) {}
 
   create(createApplicationDto: CreateApplicationDto) {
-    const nextId = this.applications.length > 0 ? this.applications[this.applications.length - 1].id + 1 : 1;
-    const newApplication: Application = {
-      id: nextId,
+    const application = this.applicationsRepository.create({
       ...createApplicationDto,
       status: 'pendiente',
-    };
-
-    this.applications.push(newApplication);
-    return newApplication;
+    });
+    return this.applicationsRepository.save(application);
   }
 
   findAll() {
-    return this.applications;
+    return this.applicationsRepository.find();
   }
 
-  findOne(id: number) {
-    const application = this.applications.find((item) => item.id === id);
+  async findOne(id: number) {
+    const application = await this.applicationsRepository.findOneBy({ id });
 
     if (!application) {
       throw new NotFoundException('Solicitud no encontrada');
@@ -54,34 +34,28 @@ export class ApplicationsService {
     return application;
   }
 
-  update(id: number, updateApplicationDto: UpdateApplicationDto) {
-    const application = this.findOne(id);
+  async update(id: number, updateApplicationDto: UpdateApplicationDto) {
+    const application = await this.findOne(id);
     Object.assign(application, updateApplicationDto);
-    return application;
+    return this.applicationsRepository.save(application);
   }
 
-  remove(id: number) {
-    const index = this.applications.findIndex((application) => application.id === id);
-
-    if (index === -1) {
-      throw new NotFoundException('Solicitud no encontrada');
-    }
-
-    const [deletedApplication] = this.applications.splice(index, 1);
-    return deletedApplication;
+  async remove(id: number) {
+    const application = await this.findOne(id);
+    return this.applicationsRepository.remove(application);
   }
 
   findByStudent(studentId: number) {
-    return this.applications.filter((application) => application.studentId === studentId);
+    return this.applicationsRepository.findBy({ studentId });
   }
 
   findByScholarship(scholarshipId: number) {
-    return this.applications.filter((application) => application.scholarshipId === scholarshipId);
+    return this.applicationsRepository.findBy({ scholarshipId });
   }
 
-  updateStatus(id: number, status: ApplicationStatus) {
-    const application = this.findOne(id);
+  async updateStatus(id: number, status: ApplicationStatus) {
+    const application = await this.findOne(id);
     application.status = status;
-    return application;
+    return this.applicationsRepository.save(application);
   }
 }
