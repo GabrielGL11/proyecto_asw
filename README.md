@@ -73,9 +73,9 @@ Application
 
 Actualmente se ha configurado la conexión de desarrollo con **PostgreSQL + TypeORM** mediante variables de entorno.
 
-El módulo **`scholarships`** ya cuenta con una entidad de TypeORM, una tabla en PostgreSQL y persistencia mediante `Repository`.
+Los módulos **`scholarships`**, **`students`** y **`tracking`** cuentan con entidades de TypeORM, tablas en PostgreSQL y persistencia mediante `Repository`.
 
-Los demás módulos mantienen actualmente su implementación original mientras se realiza progresivamente la migración hacia persistencia con TypeORM.
+Los módulos `applications` y `documents` mantienen actualmente su implementación original mientras se realiza progresivamente la migración hacia persistencia con TypeORM.
 
 ---
 
@@ -111,7 +111,7 @@ Las **Entities** representan las estructuras de datos que serán persistidas med
 
 ### Arquitectura de persistencia
 
-Para el módulo `scholarships`, el flujo actual es:
+Para los módulos `scholarships`, `students` y `tracking`, el flujo actual es:
 
 ```text
 Controller
@@ -125,7 +125,7 @@ TypeORM
 PostgreSQL
 ```
 
-El servicio de `scholarships` utiliza `Repository<Scholarship>` para realizar las operaciones de consulta, creación, actualización y eliminación de registros.
+Los servicios de `scholarships`, `students` y `tracking` utilizan repositorios de TypeORM para realizar operaciones de consulta, creación, actualización y eliminación de registros.
 
 ---
 
@@ -273,6 +273,8 @@ src/
 │   ├── dto/
 │   │   ├── create-student.dto.ts
 │   │   └── update-student.dto.ts
+│   ├── entities/
+│   │   └── students.entity.ts
 │   ├── pipes/
 │   │   └── parse-student-id.pipe.ts
 │   ├── students.controller.ts
@@ -283,6 +285,8 @@ src/
 │   ├── dto/
 │   │   ├── create-tracking.dto.ts
 │   │   └── update-tracking.dto.ts
+│   ├── entities/
+│   │   └── tracking.entity.ts
 │   ├── pipes/
 │   │   └── parse-tracking-id.pipe.ts
 │   ├── tracking.controller.ts
@@ -295,7 +299,7 @@ src/
 └── main.ts
 ```
 
-La entidad `scholarship.entity.ts` representa actualmente el modelo persistente de las becas.
+Las entidades de `scholarships`, `students` y `tracking` representan actualmente los modelos persistentes de esos recursos.
 
 ---
 
@@ -326,6 +330,12 @@ semester
 
 isActive
 ```
+
+### Entidad y persistencia
+
+La entidad `src/students/entities/students.entity.ts` representa la tabla `students` mediante `@Entity('students')`. El campo `id` es la clave primaria autogenerada y los demás campos se almacenan como columnas: `firstName`, `lastName`, `nationalId`, `email`, `age`, `career`, `semester` e `isActive`.
+
+El módulo registra `Student` con `TypeOrmModule.forFeature([Student])`, y el servicio utiliza `Repository<Student>` para las operaciones CRUD en PostgreSQL.
 
 ### Endpoints
 
@@ -598,6 +608,12 @@ comment
 
 createdAt
 ```
+
+### Entidad y persistencia
+
+La entidad `src/tracking/entities/tracking.entity.ts` representa la tabla `tracking` mediante `@Entity('tracking')`. El campo `id` es la clave primaria autogenerada; `applicationId`, `status` y `createdAt` son columnas obligatorias, mientras que `comment` permite valores nulos.
+
+El módulo registra `Tracking` con `TypeOrmModule.forFeature([Tracking])`, y el servicio utiliza `Repository<Tracking>` para las operaciones CRUD en PostgreSQL. Al crear un registro, `createdAt` se asigna automáticamente con la fecha y hora actuales en formato ISO.
 
 ### Endpoints
 
