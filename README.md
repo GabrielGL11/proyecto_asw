@@ -9,9 +9,7 @@
 <h1 align="center">Sistema de Gestión de Becas ULEAM</h1>
 
 <p align="center">
-
 Backend desarrollado con <strong>NestJS + TypeScript</strong> para la gestión de becas estudiantiles de la Universidad Laica Eloy Alfaro de Manabí (ULEAM).
-
 </p>
 
 ---
@@ -51,6 +49,8 @@ Application
    └── 1:N ──> Tracking
 ```
 
+Actualmente las relaciones entre los recursos se representan mediante identificadores como `studentId`, `scholarshipId` y `applicationId`.
+
 ---
 
 ## Tecnologías
@@ -71,11 +71,27 @@ Application
 
 ### Estado de la persistencia
 
-Actualmente se ha configurado la conexión de desarrollo con **PostgreSQL + TypeORM** mediante variables de entorno.
+Actualmente el proyecto cuenta con una configuración de desarrollo utilizando **PostgreSQL + TypeORM** mediante variables de entorno.
 
-Los módulos **`scholarships`**, **`students`** y **`tracking`** cuentan con entidades de TypeORM, tablas en PostgreSQL y persistencia mediante `Repository`.
+Se han creado las cinco entidades principales del sistema:
 
-Los módulos `applications` y `documents` mantienen actualmente su implementación original mientras se realiza progresivamente la migración hacia persistencia con TypeORM.
+* `Student`
+* `Scholarship`
+* `Application`
+* `Document`
+* `Tracking`
+
+También se han creado las cinco tablas correspondientes en la base de datos PostgreSQL:
+
+```text
+students
+scholarships
+applications
+documents
+tracking
+```
+
+La configuración utiliza `autoLoadEntities: true` para cargar automáticamente las entidades registradas mediante los módulos de TypeORM.
 
 ---
 
@@ -87,15 +103,10 @@ Cada recurso cuenta con su propio módulo y separa las responsabilidades princip
 
 ```text
 Module
-
 ├── Controller
-
 ├── Service
-
 ├── DTO
-
 ├── Pipes
-
 └── Entity
 ```
 
@@ -107,11 +118,11 @@ Los **DTOs** definen y validan los datos recibidos.
 
 Los **Pipes** permiten validar parámetros como los identificadores.
 
-Las **Entities** representan las estructuras de datos que serán persistidas mediante TypeORM.
+Las **Entities** representan las estructuras de datos que son persistidas mediante TypeORM.
 
 ### Arquitectura de persistencia
 
-Para los módulos `scholarships`, `students` y `tracking`, el flujo actual es:
+La configuración general de persistencia utiliza el siguiente flujo:
 
 ```text
 Controller
@@ -125,7 +136,7 @@ TypeORM
 PostgreSQL
 ```
 
-Los servicios de `scholarships`, `students` y `tracking` utilizan repositorios de TypeORM para realizar operaciones de consulta, creación, actualización y eliminación de registros.
+Los módulos que utilizan repositorios de TypeORM realizan sus operaciones de consulta, creación, actualización y eliminación directamente sobre PostgreSQL.
 
 ---
 
@@ -137,11 +148,8 @@ El proyecto utiliza una instancia local de PostgreSQL para el desarrollo.
 
 ```text
 Nombre: SG_Becas_ULEAM
-
 Host: localhost
-
 Puerto: 5432
-
 Usuario: postgres
 ```
 
@@ -189,25 +197,16 @@ y:
 
 ```ts
 TypeOrmModule.forRootAsync({
+  imports: [ConfigModule],
   inject: [ConfigService],
-
   useFactory: (config: ConfigService) => ({
     type: 'postgres',
-
-    host: config.getOrThrow<string>('DATABASE_HOST'),
-
-    port: Number(
-      config.getOrThrow<string>('DATABASE_PORT'),
-    ),
-
-    username: config.getOrThrow<string>('DATABASE_USER'),
-
-    password: config.getOrThrow<string>('DATABASE_PASSWORD'),
-
-    database: config.getOrThrow<string>('DATABASE_NAME'),
-
+    host: config.get<string>('DATABASE_HOST'),
+    port: Number(config.get<string>('DATABASE_PORT')),
+    username: config.get<string>('DATABASE_USER'),
+    password: config.get<string>('DATABASE_PASSWORD'),
+    database: config.get<string>('DATABASE_NAME'),
     autoLoadEntities: true,
-
     synchronize: true,
   }),
 })
@@ -235,12 +234,13 @@ Actualmente el proyecto cuenta con los cinco módulos principales:
 
 ```text
 src/
-
 │
 ├── applications/
 │   ├── dto/
 │   │   ├── create-application.dto.ts
 │   │   └── update-application.dto.ts
+│   ├── entities/
+│   │   └── application.entity.ts
 │   ├── pipes/
 │   │   └── parse-application-id.pipe.ts
 │   ├── applications.controller.ts
@@ -251,6 +251,8 @@ src/
 │   ├── dto/
 │   │   ├── create-document.dto.ts
 │   │   └── update-document.dto.ts
+│   ├── entities/
+│   │   └── document.entity.ts
 │   ├── pipes/
 │   │   └── parse-document-id.pipe.ts
 │   ├── documents.controller.ts
@@ -299,11 +301,13 @@ src/
 └── main.ts
 ```
 
-Las entidades de `scholarships`, `students` y `tracking` representan actualmente los modelos persistentes de esos recursos.
+> Los nombres exactos de los archivos de las entidades deben coincidir con los existentes en el repositorio.
+
+Las cinco entidades representan actualmente los modelos principales del sistema y se encuentran configuradas para trabajar con TypeORM.
 
 ---
 
-# Módulos implementados
+# Entidades del sistema
 
 ## Students
 
@@ -313,61 +317,31 @@ El módulo `students` permite gestionar los estudiantes que pueden solicitar una
 
 ```text
 id
-
 firstName
-
 lastName
-
 nationalId
-
 email
-
 age
-
 career
-
 semester
-
 isActive
 ```
 
-### Entidad y persistencia
+La entidad se encuentra en:
 
-La entidad `src/students/entities/students.entity.ts` representa la tabla `students` mediante `@Entity('students')`. El campo `id` es la clave primaria autogenerada y los demás campos se almacenan como columnas: `firstName`, `lastName`, `nationalId`, `email`, `age`, `career`, `semester` e `isActive`.
+```text
+src/students/entities/students.entity.ts
+```
 
-El módulo registra `Student` con `TypeOrmModule.forFeature([Student])`, y el servicio utiliza `Repository<Student>` para las operaciones CRUD en PostgreSQL.
+La tabla correspondiente en PostgreSQL es:
 
-### Endpoints
-
-| Método | Endpoint        | Descripción                   |
-| ------ | --------------- | ----------------------------- |
-| GET    | `/students`     | Obtener todos los estudiantes |
-| GET    | `/students/:id` | Obtener un estudiante por ID  |
-| POST   | `/students`     | Crear un estudiante           |
-| PATCH  | `/students/:id` | Actualizar un estudiante      |
-| DELETE | `/students/:id` | Eliminar un estudiante        |
-
-### Validaciones
-
-El módulo utiliza DTOs y `class-validator`.
-
-Se validan:
-
-* Nombre obligatorio.
-* Apellido obligatorio.
-* Cédula obligatoria.
-* Correo electrónico válido.
-* Edad como número entero positivo.
-* Carrera obligatoria.
-* Semestre entre 1 y 10.
-* Estado activo como booleano.
-* ID como número entero positivo.
-
-Las actualizaciones utilizan `PartialType`, permitiendo modificar únicamente los campos enviados.
+```text
+students
+```
 
 ---
 
-# Scholarships
+## Scholarships
 
 El módulo `scholarships` permite gestionar las becas disponibles.
 
@@ -375,23 +349,13 @@ El módulo `scholarships` permite gestionar las becas disponibles.
 
 ```text
 id
-
 name
-
 description
-
 amount
-
 startDate
-
 endDate
-
 isActive
 ```
-
-### Persistencia
-
-El módulo utiliza actualmente **TypeORM + PostgreSQL**.
 
 La entidad se encuentra en:
 
@@ -407,22 +371,196 @@ La entidad utiliza:
 
 para representar la tabla `scholarships` en PostgreSQL.
 
-El módulo registra la entidad mediante:
+### Tabla
 
-```ts
-TypeOrmModule.forFeature([Scholarship])
+```text
+scholarships
 ```
 
-El servicio utiliza un repositorio de TypeORM:
+### Ejemplo de estructura
 
 ```ts
-@InjectRepository(Scholarship)
-private readonly scholarshipsRepository: Repository<Scholarship>
+@Entity('scholarships')
+export class Scholarship {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  name: string;
+
+  @Column()
+  description: string;
+
+  @Column()
+  amount: number;
+
+  @Column()
+  startDate: string;
+
+  @Column()
+  endDate: string;
+
+  @Column()
+  isActive: boolean;
+}
 ```
 
-Las operaciones CRUD se realizan directamente sobre PostgreSQL mediante este repositorio.
+---
 
-### Endpoints
+## Applications
+
+El módulo `applications` permite registrar y administrar las solicitudes de beca realizadas por los estudiantes.
+
+### Datos de la solicitud
+
+```text
+id
+studentId
+scholarshipId
+gpa
+income
+comment
+status
+```
+
+La entidad utiliza la tabla:
+
+```text
+applications
+```
+
+### Estados
+
+Las solicitudes utilizan los siguientes estados:
+
+```text
+pendiente
+revision
+aprobada
+rechazada
+correccion
+```
+
+### Ejemplo de solicitud
+
+```json
+{
+  "studentId": 1,
+  "scholarshipId": 1,
+  "gpa": 8.7,
+  "income": 450,
+  "comment": "Solicitud de beca por situación económica"
+}
+```
+
+Los campos `studentId` y `scholarshipId` permiten identificar al estudiante y la beca asociados a la solicitud.
+
+---
+
+## Documents
+
+El módulo `documents` permite gestionar los documentos asociados a una solicitud de beca.
+
+### Datos del documento
+
+```text
+id
+applicationId
+name
+url
+status
+```
+
+La entidad utiliza la tabla:
+
+```text
+documents
+```
+
+### Estados
+
+Los documentos pueden manejar los siguientes estados:
+
+```text
+pendiente
+cargado
+observado
+aprobado
+```
+
+### Ejemplo
+
+```json
+{
+  "applicationId": 1,
+  "name": "Certificado de notas",
+  "url": "https://example.com/certificado-notas.pdf"
+}
+```
+
+El campo `applicationId` permite identificar la solicitud a la que pertenece el documento.
+
+---
+
+## Tracking
+
+El módulo `tracking` permite registrar y administrar el historial de seguimiento de las solicitudes de beca.
+
+### Datos del seguimiento
+
+```text
+id
+applicationId
+status
+comment
+createdAt
+```
+
+La entidad utiliza la tabla:
+
+```text
+tracking
+```
+
+El campo `applicationId` permite identificar la solicitud relacionada con el seguimiento.
+
+### Estados
+
+Los registros de seguimiento admiten:
+
+```text
+pendiente
+revision
+aprobada
+rechazada
+correccion
+```
+
+### Ejemplo
+
+```json
+{
+  "applicationId": 1,
+  "status": "revision",
+  "comment": "Documentación enviada a revisión."
+}
+```
+
+---
+
+# Endpoints
+
+## Students
+
+| Método | Endpoint        | Descripción                   |
+| ------ | --------------- | ----------------------------- |
+| GET    | `/students`     | Obtener todos los estudiantes |
+| GET    | `/students/:id` | Obtener un estudiante por ID  |
+| POST   | `/students`     | Crear un estudiante           |
+| PATCH  | `/students/:id` | Actualizar un estudiante      |
+| DELETE | `/students/:id` | Eliminar un estudiante        |
+
+## Scholarships
 
 | Método | Endpoint            | Descripción             |
 | ------ | ------------------- | ----------------------- |
@@ -432,50 +570,7 @@ Las operaciones CRUD se realizan directamente sobre PostgreSQL mediante este rep
 | PATCH  | `/scholarships/:id` | Actualizar una beca     |
 | DELETE | `/scholarships/:id` | Eliminar una beca       |
 
-### Validaciones
-
-El módulo utiliza DTOs con `class-validator` y un pipe personalizado para validar los IDs.
-
-Las actualizaciones utilizan `PartialType`.
-
-### Persistencia verificada
-
-Se realizaron pruebas mediante Thunder Client para verificar:
-
-* Consulta de becas.
-* Creación de becas.
-* Consulta por ID.
-* Actualización de becas.
-* Eliminación de becas.
-* Persistencia de los registros en PostgreSQL.
-
-Los registros creados mediante `POST /scholarships` fueron almacenados en la tabla `scholarships`.
-
----
-
-# Applications
-
-El módulo `applications` permite registrar y administrar las solicitudes de beca realizadas por los estudiantes.
-
-### Datos de la solicitud
-
-```text
-id
-
-studentId
-
-scholarshipId
-
-gpa
-
-income
-
-comment
-
-status
-```
-
-### Endpoints
+## Applications
 
 | Método | Endpoint                                   | Descripción                        |
 | ------ | ------------------------------------------ | ---------------------------------- |
@@ -488,64 +583,7 @@ status
 | PATCH  | `/applications/:id/status`                 | Cambiar el estado de una solicitud |
 | DELETE | `/applications/:id`                        | Eliminar una solicitud             |
 
-### Datos para crear una solicitud
-
-El `CreateApplicationDto` utiliza los siguientes campos:
-
-```json
-{
-  "studentId": 1,
-  "scholarshipId": 1,
-  "gpa": 8.7,
-  "income": 450,
-  "comment": "Solicitud de beca por situación económica"
-}
-```
-
-### Validaciones
-
-Se valida:
-
-* `studentId` como entero positivo.
-* `scholarshipId` como entero positivo.
-* `gpa` como número mayor o igual a 0.
-* `income` como número mayor o igual a 0.
-* `comment` como texto opcional.
-* ID como número entero positivo.
-
-### Estados
-
-Las solicitudes utilizan estados para representar el avance del proceso:
-
-* `pendiente`
-* `revision`
-* `aprobada`
-* `rechazada`
-* `correccion`
-
-El estado puede ser gestionado por el endpoint específico de cambio de estado.
-
----
-
-# Documents
-
-El módulo `documents` permite gestionar los documentos asociados a una solicitud de beca.
-
-### Datos del documento
-
-```text
-id
-
-applicationId
-
-name
-
-url
-
-status
-```
-
-### Endpoints
+## Documents
 
 | Método | Endpoint                                | Descripción                      |
 | ------ | --------------------------------------- | -------------------------------- |
@@ -557,65 +595,7 @@ status
 | PATCH  | `/documents/:id/status`                 | Cambiar el estado del documento  |
 | DELETE | `/documents/:id`                        | Eliminar un documento            |
 
-### Datos para crear un documento
-
-El `CreateDocumentDto` utiliza:
-
-```json
-{
-  "applicationId": 1,
-  "name": "Certificado de notas",
-  "url": "https://example.com/certificado-notas.pdf"
-}
-```
-
-### Validaciones
-
-Se valida:
-
-* `applicationId` como entero positivo.
-* `name` obligatorio y de tipo texto.
-* `url` opcional y de tipo texto.
-* ID como número entero positivo.
-
-### Estados
-
-Los documentos pueden manejar los siguientes estados:
-
-* `pendiente`
-* `cargado`
-* `observado`
-* `aprobado`
-
----
-
-# Tracking
-
-El módulo `tracking` permite registrar y administrar el historial de seguimiento de las solicitudes de beca.
-
-Cada registro permite conocer el estado de una solicitud y almacenar un comentario relacionado con el seguimiento.
-
-### Datos del seguimiento
-
-```text
-id
-
-applicationId
-
-status
-
-comment
-
-createdAt
-```
-
-### Entidad y persistencia
-
-La entidad `src/tracking/entities/tracking.entity.ts` representa la tabla `tracking` mediante `@Entity('tracking')`. El campo `id` es la clave primaria autogenerada; `applicationId`, `status` y `createdAt` son columnas obligatorias, mientras que `comment` permite valores nulos.
-
-El módulo registra `Tracking` con `TypeOrmModule.forFeature([Tracking])`, y el servicio utiliza `Repository<Tracking>` para las operaciones CRUD en PostgreSQL. Al crear un registro, `createdAt` se asigna automáticamente con la fecha y hora actuales en formato ISO.
-
-### Endpoints
+## Tracking
 
 | Método | Endpoint                               | Descripción                                |
 | ------ | -------------------------------------- | ------------------------------------------ |
@@ -625,40 +605,6 @@ El módulo registra `Tracking` con `TypeOrmModule.forFeature([Tracking])`, y el 
 | POST   | `/tracking`                            | Crear un registro de seguimiento           |
 | PATCH  | `/tracking/:id`                        | Actualizar un registro de seguimiento      |
 | DELETE | `/tracking/:id`                        | Eliminar un registro de seguimiento        |
-
-### Datos para crear un seguimiento
-
-El `CreateTrackingDto` utiliza:
-
-```json
-{
-  "applicationId": 1,
-  "status": "revision",
-  "comment": "Documentación enviada a revisión."
-}
-```
-
-### Estados
-
-Los registros de seguimiento admiten los siguientes estados:
-
-* `pendiente`
-* `revision`
-* `aprobada`
-* `rechazada`
-* `correccion`
-
-### Validaciones
-
-El DTO `CreateTrackingDto` valida:
-
-* `applicationId` obligatorio, entero y positivo.
-* `status` obligatorio y limitado a los estados permitidos.
-* `comment` opcional, de tipo texto y no vacío cuando se proporciona.
-
-Las rutas que reciben un ID de seguimiento utilizan `ParseTrackingIdPipe` para validar que sea un entero positivo.
-
-El parámetro `applicationId` utilizado para consultar el historial se convierte y valida mediante `ParseIntPipe`.
 
 ---
 
@@ -683,7 +629,7 @@ Esta configuración permite:
 * Permitir únicamente propiedades definidas en los DTOs.
 * Rechazar propiedades que no estén definidas en los DTOs.
 
-Los errores de validación generan respuestas HTTP:
+Los errores de validación generan respuestas:
 
 ```text
 400 Bad Request
@@ -814,7 +760,7 @@ Content-Type: application/json
 ### Actualizar una beca
 
 ```http
-PATCH http://localhost:5500/scholarships/2
+PATCH http://localhost:5500/scholarships/1
 Content-Type: application/json
 ```
 
@@ -828,8 +774,10 @@ Content-Type: application/json
 ### Eliminar una beca
 
 ```http
-DELETE http://localhost:5500/scholarships/2
+DELETE http://localhost:5500/scholarships/1
 ```
+
+---
 
 ## Applications
 
@@ -854,8 +802,8 @@ Content-Type: application/json
 
 ```json
 {
-  "studentId": 2,
-  "scholarshipId": 2,
+  "studentId": 1,
+  "scholarshipId": 1,
   "gpa": 9.2,
   "income": 650,
   "comment": "Solicitud de beca por mérito académico"
@@ -865,7 +813,7 @@ Content-Type: application/json
 ### Actualizar una solicitud
 
 ```http
-PATCH http://localhost:5500/applications/4
+PATCH http://localhost:5500/applications/1
 Content-Type: application/json
 ```
 
@@ -876,10 +824,23 @@ Content-Type: application/json
 }
 ```
 
+### Cambiar estado
+
+```http
+PATCH http://localhost:5500/applications/1/status
+Content-Type: application/json
+```
+
+```json
+{
+  "status": "aprobada"
+}
+```
+
 ### Eliminar una solicitud
 
 ```http
-DELETE http://localhost:5500/applications/4
+DELETE http://localhost:5500/applications/1
 ```
 
 ---
@@ -890,6 +851,12 @@ DELETE http://localhost:5500/applications/4
 
 ```http
 GET http://localhost:5500/documents
+```
+
+### Obtener documentos de una solicitud
+
+```http
+GET http://localhost:5500/documents/application/1
 ```
 
 ### Crear un documento
@@ -910,7 +877,7 @@ Content-Type: application/json
 ### Actualizar un documento
 
 ```http
-PATCH http://localhost:5500/documents/2
+PATCH http://localhost:5500/documents/1
 Content-Type: application/json
 ```
 
@@ -921,10 +888,23 @@ Content-Type: application/json
 }
 ```
 
+### Cambiar estado
+
+```http
+PATCH http://localhost:5500/documents/1/status
+Content-Type: application/json
+```
+
+```json
+{
+  "status": "aprobado"
+}
+```
+
 ### Eliminar un documento
 
 ```http
-DELETE http://localhost:5500/documents/2
+DELETE http://localhost:5500/documents/1
 ```
 
 ---
@@ -940,7 +920,13 @@ GET http://localhost:5500/tracking
 ### Obtener un seguimiento
 
 ```http
-GET http://localhost:5500/tracking/2
+GET http://localhost:5500/tracking/1
+```
+
+### Obtener historial de una solicitud
+
+```http
+GET http://localhost:5500/tracking/application/1
 ```
 
 ### Crear un seguimiento
@@ -961,7 +947,7 @@ Content-Type: application/json
 ### Actualizar un seguimiento
 
 ```http
-PATCH http://localhost:5500/tracking/2
+PATCH http://localhost:5500/tracking/1
 Content-Type: application/json
 ```
 
@@ -972,23 +958,10 @@ Content-Type: application/json
 }
 ```
 
-### Actualización parcial
-
-```http
-PATCH http://localhost:5500/tracking/2
-Content-Type: application/json
-```
-
-```json
-{
-  "comment": "Solicitud aprobada correctamente y registrada."
-}
-```
-
 ### Eliminar un seguimiento
 
 ```http
-DELETE http://localhost:5500/tracking/3
+DELETE http://localhost:5500/tracking/1
 ```
 
 ---
@@ -997,182 +970,95 @@ DELETE http://localhost:5500/tracking/3
 
 Durante las pruebas con Thunder Client se verificaron casos de éxito y error en los diferentes módulos.
 
-## Scholarships
+### Ejemplos de respuestas esperadas
 
 ```text
-GET /scholarships       → 200 OK
-GET /scholarships/1    → 200 OK
-POST /scholarships     → 201 Created
-PATCH /scholarships/2  → 200 OK
-DELETE /scholarships/2 → 200 OK
+GET /students          → 200 OK
+GET /students/1       → 200 OK
+POST /students        → 201 Created
+
+GET /scholarships     → 200 OK
+GET /scholarships/1   → 200 OK
+POST /scholarships    → 201 Created
+
+GET /applications     → 200 OK
+GET /applications/1   → 200 OK
+POST /applications    → 201 Created
+
+GET /documents        → 200 OK
+POST /documents       → 201 Created
+
+GET /tracking         → 200 OK
+GET /tracking/1       → 200 OK
+POST /tracking        → 201 Created
 ```
 
-También se verificó que los registros creados y actualizados mediante la API fueran almacenados correctamente en PostgreSQL.
+### Validaciones
 
-## Applications
+También se contemplan casos como:
 
 ```text
-GET /applications                 → 200 OK
-
-GET /applications/1              → 200 OK
-
-POST /applications               → 201 Created
-
-PATCH /applications/4            → 200 OK
-
-DELETE /applications/4           → 200 OK
-
-GET /applications/4             → 404 Not Found
-
-GET /applications/a             → 400 Bad Request
-
-POST con datos inválidos         → 400 Bad Request
+ID inválido              → 400 Bad Request
+Datos inválidos          → 400 Bad Request
+Propiedad no permitida   → 400 Bad Request
+Recurso inexistente      → 404 Not Found
 ```
 
-## Documents
-
-```text
-GET /documents                   → 200 OK
-
-POST /documents                  → 201 Created
-
-PATCH /documents/2               → 200 OK
-
-DELETE /documents/2              → 200 OK
-
-GET /documents/2                 → 404 Not Found
-
-GET /documents/a                 → 400 Bad Request
-
-POST con datos inválidos         → 400 Bad Request
-```
-
-## Tracking
-
-```text
-GET /tracking                    → 200 OK
-
-GET /tracking/2                  → 200 OK
-
-POST /tracking                   → 201 Created
-
-PATCH /tracking/2                → 200 OK
-
-PATCH /tracking/2                → 200 OK
-
-DELETE /tracking/3               → 200 OK
-
-DELETE /tracking/999             → 404 Not Found
-```
-
-### Validaciones de Tracking
-
-Durante las pruebas también se verificaron:
-
-```text
-PATCH con status inválido        → 400 Bad Request
-
-PATCH con applicationId: 0       → 400 Bad Request
-
-PATCH con applicationId: "abc"   → 400 Bad Request
-
-PATCH con comment vacío          → 400 Bad Request
-
-PATCH con propiedad no permitida → 400 Bad Request
-```
-
-### Ejemplo de estado inválido
-
-```json
-{
-  "status": "cancelada"
-}
-```
-
-Respuesta:
-
-```json
-{
-  "message": [
-    "status must be one of the following values: pendiente, revision, aprobada, rechazada, correccion"
-  ],
-  "error": "Bad Request",
-  "statusCode": 400
-}
-```
-
-### Ejemplo de propiedad no permitida
-
-```json
-{
-  "estado": "pendiente"
-}
-```
-
-Respuesta:
-
-```json
-{
-  "message": [
-    "property estado should not exist"
-  ],
-  "error": "Bad Request",
-  "statusCode": 400
-}
-```
-
-### Ejemplo de recurso inexistente
-
-```http
-DELETE /tracking/999
-```
-
-Respuesta:
-
-```json
-{
-  "message": "Registro de seguimiento no encontrado",
-  "error": "Not Found",
-  "statusCode": 404
-}
-```
-
----
-
-# Manejo de errores
-
-El backend contempla errores relacionados con:
-
-* Datos inválidos.
-* Propiedades no permitidas.
-* IDs inválidos.
-* Recursos inexistentes.
-
-### ID inválido
+Ejemplo:
 
 ```http
 GET /students/a
 ```
 
-Respuesta:
+Respuesta esperada:
 
 ```text
 400 Bad Request
 ```
 
-### Recurso inexistente
+Ejemplo:
 
 ```http
 GET /students/999
 ```
 
-Respuesta:
+Respuesta esperada:
 
 ```text
 404 Not Found
 ```
 
-Estos criterios también se aplican a los módulos de `scholarships`, `applications`, `documents` y `tracking`, de acuerdo con las validaciones implementadas en cada módulo.
+---
+
+# Base de datos
+
+La configuración actual utiliza PostgreSQL y TypeORM.
+
+Al iniciar la aplicación correctamente se verificó que TypeORM pudiera conectarse a PostgreSQL y crear las tablas correspondientes.
+
+Las tablas principales actualmente creadas son:
+
+```text
+students
+scholarships
+applications
+documents
+tracking
+```
+
+La aplicación utiliza:
+
+```ts
+autoLoadEntities: true
+```
+
+y:
+
+```ts
+synchronize: true
+```
+
+durante el desarrollo local.
 
 ---
 
@@ -1211,40 +1097,42 @@ Actualmente se encuentran implementados:
 * [x] Instalación de dependencias de PostgreSQL y TypeORM.
 * [x] Configuración de variables de entorno.
 * [x] Configuración de `ConfigModule`.
-* [x] Configuración inicial de `TypeOrmModule`.
-* [x] Compilación exitosa del proyecto con TypeORM.
+* [x] Configuración de `TypeOrmModule`.
+* [x] Entidad TypeORM de `students`.
 * [x] Entidad TypeORM de `scholarships`.
-* [x] Registro de `Scholarship` mediante `TypeOrmModule.forFeature`.
-* [x] Creación de la tabla `scholarships` mediante TypeORM.
-* [x] Persistencia de `scholarships` mediante `Repository`.
-* [x] CRUD de `scholarships` conectado a PostgreSQL.
-* [x] Verificación de registros mediante PostgreSQL.
+* [x] Entidad TypeORM de `applications`.
+* [x] Entidad TypeORM de `documents`.
+* [x] Entidad TypeORM de `tracking`.
+* [x] Creación de la tabla `students`.
+* [x] Creación de la tabla `scholarships`.
+* [x] Creación de la tabla `applications`.
+* [x] Creación de la tabla `documents`.
+* [x] Creación de la tabla `tracking`.
+* [x] Conexión de desarrollo con PostgreSQL.
+* [x] Compilación exitosa del proyecto con TypeORM.
 
 ### Pendiente
 
-* [ ] Crear las entidades TypeORM de los demás módulos.
-* [ ] Registrar las entidades restantes en sus módulos.
-* [ ] Crear las tablas restantes mediante TypeORM.
-* [ ] Migrar los servicios restantes desde almacenamiento en memoria hacia repositorios TypeORM.
-* [ ] Definir las relaciones entre entidades.
-* [ ] Verificar la persistencia de los demás módulos después de reiniciar la aplicación.
+* [ ] Verificar la persistencia mediante repositorios TypeORM en los módulos que todavía utilicen almacenamiento temporal.
+* [ ] Verificar las operaciones CRUD de cada módulo directamente contra PostgreSQL.
+* [ ] Definir relaciones TypeORM explícitas (`@ManyToOne`, `@OneToMany`) si son requeridas por el diseño final.
+* [ ] Verificar la persistencia de los registros después de reiniciar la aplicación.
 * [ ] Realizar pruebas de integración con la base de datos.
 * [ ] Completar la documentación final de evidencias.
+* [ ] Preparar migraciones para un entorno de producción.
 
 ---
 
 # Próximos pasos
 
-1. Crear las entidades TypeORM para los módulos restantes.
-2. Registrar las entidades mediante `TypeOrmModule.forFeature`.
-3. Crear las tablas correspondientes mediante TypeORM.
-4. Sustituir los arreglos temporales de los módulos restantes por repositorios TypeORM.
-5. Definir las relaciones entre entidades.
-6. Mantener el mismo contrato HTTP de los endpoints.
-7. Verificar la persistencia después de reiniciar la aplicación.
-8. Realizar pruebas de integración.
-9. Actualizar las evidencias del proyecto.
-10. Completar la documentación final.
+1. Verificar los repositorios TypeORM de cada módulo.
+2. Comprobar las operaciones CRUD directamente en PostgreSQL.
+3. Verificar las relaciones entre estudiantes, solicitudes, becas, documentos y seguimientos.
+4. Mantener el mismo contrato HTTP de los endpoints.
+5. Verificar la persistencia después de reiniciar la aplicación.
+6. Realizar pruebas de integración.
+7. Actualizar las evidencias del proyecto.
+8. Completar la documentación final.
 
 ---
 
@@ -1281,6 +1169,6 @@ npm run test:cov
 
 # Autoría
 
-Proyecto académico desarrollado para la asignatura de desarrollo backend web.
+Proyecto académico desarrollado para la asignatura de Desarrollo Backend Web.
 
 **ULEAM — Universidad Laica Eloy Alfaro de Manabí**
