@@ -7,32 +7,28 @@ import { ScholarshipsModule } from './scholarships/scholarships.module.js';
 import { StudentsModule } from './students/students.module.js';
 import { ApplicationsModule } from './applications/applications.module.js';
 import { DocumentsModule } from './documents/documents.module.js';
-import { TrackingModule } from './tracking/tracking.module.js';
+
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
-        host: config.getOrThrow<string>('DATABASE_HOST'),
-        port: Number(
-          config.getOrThrow<string>('DATABASE_PORT'),
-        ),
-        username: config.getOrThrow<string>('DATABASE_USER'),
-        password: config.getOrThrow<string>('DATABASE_PASSWORD'),
-        database: config.getOrThrow<string>('DATABASE_NAME'),
+        host: config.get('DB_HOST'),
+        port: +config.get('DB_PORT'),
+        username: config.get('DB_USERNAME'),
+        password: config.get('DB_PASSWORD'),
+        database: config.get('DB_NAME'),
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: true, // OJO: solo en desarrollo, nunca en producción
       }),
     }),
     ScholarshipsModule,
     StudentsModule,
     ApplicationsModule,
     DocumentsModule,
-    TrackingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
