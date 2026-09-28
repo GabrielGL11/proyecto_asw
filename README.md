@@ -23,8 +23,6 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
 # Sistema de Gestión de Becas ULEAM
 
 ## Descripción
