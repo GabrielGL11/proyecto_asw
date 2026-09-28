@@ -1,18 +1,4 @@
-<p align="center">
-
-  <a href="https://nestjs.com/" target="_blank">
-    <img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" />
-  </a>
-
-</p>
-
-<h1 align="center">Sistema de Gestión de Becas ULEAM</h1>
-
-<p align="center">
-Backend desarrollado con <strong>NestJS + TypeScript</strong> para la gestión de becas estudiantiles de la Universidad Laica Eloy Alfaro de Manabí (ULEAM).
-</p>
-
----
+# Sistema de Gestión de Becas ULEAM
 
 ## Descripción
 
@@ -26,7 +12,7 @@ El sistema busca gestionar el proceso de becas universitarias mediante diferente
 * Documentos.
 * Seguimiento de solicitudes.
 
-### Modelo general
+## Modelo general
 
 ```text
 Student 1:N Application N:1 Scholarship
@@ -36,7 +22,7 @@ Application 1:N Document
 Application 1:N Tracking
 ```
 
-### Flujo general
+## Flujo general
 
 ```text
 Student
@@ -53,7 +39,7 @@ Actualmente las relaciones entre los recursos se representan mediante identifica
 
 ---
 
-## Tecnologías
+# Tecnologías
 
 * **Node.js**
 * **NestJS**
@@ -67,11 +53,13 @@ Actualmente las relaciones entre los recursos se representan mediante identifica
 * **pg**
 * **PostgreSQL**
 * **npm**
-* **Thunder Client** para las pruebas de la API
+* **Thunder Client** para las pruebas manuales de la API.
 
-### Estado de la persistencia
+---
 
-Actualmente el proyecto cuenta con una configuración de desarrollo utilizando **PostgreSQL + TypeORM** mediante variables de entorno.
+# Estado de la persistencia
+
+El proyecto utiliza **PostgreSQL + TypeORM** para la persistencia de los datos mediante variables de entorno.
 
 Se han creado las cinco entidades principales del sistema:
 
@@ -81,7 +69,7 @@ Se han creado las cinco entidades principales del sistema:
 * `Document`
 * `Tracking`
 
-También se han creado las cinco tablas correspondientes en la base de datos PostgreSQL:
+También se utilizan las cinco tablas correspondientes en PostgreSQL:
 
 ```text
 students
@@ -92,6 +80,8 @@ tracking
 ```
 
 La configuración utiliza `autoLoadEntities: true` para cargar automáticamente las entidades registradas mediante los módulos de TypeORM.
+
+Los cinco servicios utilizan repositorios de TypeORM para realizar las operaciones de consulta, creación, actualización y eliminación.
 
 ---
 
@@ -110,17 +100,27 @@ Module
 └── Entity
 ```
 
-El **Controller** recibe las solicitudes HTTP.
+### Controller
 
-El **Service** contiene la lógica de negocio.
+Recibe las solicitudes HTTP y expone los endpoints de cada recurso.
 
-Los **DTOs** definen y validan los datos recibidos.
+### Service
 
-Los **Pipes** permiten validar parámetros como los identificadores.
+Contiene la lógica de negocio y centraliza el manejo de recursos inexistentes mediante `NotFoundException`.
 
-Las **Entities** representan las estructuras de datos que son persistidas mediante TypeORM.
+### DTO
 
-### Arquitectura de persistencia
+Define y valida los datos recibidos mediante `class-validator`.
+
+### Pipes
+
+Permiten validar parámetros de entrada, especialmente los identificadores.
+
+### Entity
+
+Representa la estructura de los datos que se almacenan en PostgreSQL mediante TypeORM.
+
+## Arquitectura de persistencia
 
 La configuración general de persistencia utiliza el siguiente flujo:
 
@@ -129,14 +129,14 @@ Controller
     ↓
 Service
     ↓
-Repository
+TypeORM Repository
     ↓
 TypeORM
     ↓
 PostgreSQL
 ```
 
-Los módulos que utilizan repositorios de TypeORM realizan sus operaciones de consulta, creación, actualización y eliminación directamente sobre PostgreSQL.
+Los servicios utilizan repositorios de TypeORM para realizar las operaciones de persistencia sobre PostgreSQL.
 
 ---
 
@@ -144,7 +144,7 @@ Los módulos que utilizan repositorios de TypeORM realizan sus operaciones de co
 
 El proyecto utiliza una instancia local de PostgreSQL para el desarrollo.
 
-### Base de datos
+## Base de datos
 
 ```text
 Nombre: SG_Becas_ULEAM
@@ -155,7 +155,7 @@ Usuario: postgres
 
 La contraseña no se almacena directamente en el código fuente.
 
-### Variables de entorno
+## Variables de entorno
 
 La configuración se realiza mediante un archivo `.env`.
 
@@ -212,25 +212,23 @@ TypeOrmModule.forRootAsync({
 })
 ```
 
-### `synchronize`
+## `synchronize`
 
-Se utiliza:
+Durante el desarrollo local se utiliza:
 
 ```ts
 synchronize: true
 ```
 
-únicamente durante el desarrollo local.
-
 Esta opción permite que TypeORM cree o ajuste automáticamente las tablas a partir de las entidades.
 
-No se considera una estrategia adecuada para producción. En etapas posteriores se podrán utilizar migraciones para controlar los cambios del esquema de la base de datos.
+No se considera una estrategia adecuada para producción. En un entorno de producción se recomienda utilizar migraciones para controlar los cambios del esquema de la base de datos.
 
 ---
 
 # Estructura del proyecto
 
-Actualmente el proyecto cuenta con los cinco módulos principales:
+Actualmente el proyecto cuenta con cinco módulos principales:
 
 ```text
 src/
@@ -301,9 +299,7 @@ src/
 └── main.ts
 ```
 
-> Los nombres exactos de los archivos de las entidades deben coincidir con los existentes en el repositorio.
-
-Las cinco entidades representan actualmente los modelos principales del sistema y se encuentran configuradas para trabajar con TypeORM.
+Las cinco entidades representan los modelos principales del sistema y se encuentran configuradas para trabajar con TypeORM.
 
 ---
 
@@ -377,34 +373,6 @@ para representar la tabla `scholarships` en PostgreSQL.
 scholarships
 ```
 
-### Ejemplo de estructura
-
-```ts
-@Entity('scholarships')
-export class Scholarship {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  name: string;
-
-  @Column()
-  description: string;
-
-  @Column()
-  amount: number;
-
-  @Column()
-  startDate: string;
-
-  @Column()
-  endDate: string;
-
-  @Column()
-  isActive: boolean;
-}
-```
-
 ---
 
 ## Applications
@@ -440,6 +408,17 @@ aprobada
 rechazada
 correccion
 ```
+
+### DTOs
+
+El módulo utiliza:
+
+```text
+create-application.dto.ts
+update-application.dto.ts
+```
+
+`UpdateApplicationDto` permite realizar actualizaciones parciales.
 
 ### Ejemplo de solicitud
 
@@ -486,6 +465,15 @@ pendiente
 cargado
 observado
 aprobado
+```
+
+### DTOs
+
+El módulo utiliza:
+
+```text
+create-document.dto.ts
+update-document.dto.ts
 ```
 
 ### Ejemplo
@@ -600,7 +588,7 @@ correccion
 | Método | Endpoint                               | Descripción                                |
 | ------ | -------------------------------------- | ------------------------------------------ |
 | GET    | `/tracking`                            | Obtener todos los registros de seguimiento |
-| GET    | `/tracking/:id`                        | Obtener un registro por ID                 |
+| GET    | `/tracking/:id`                        | Obtener un registro de seguimiento         |
 | GET    | `/tracking/application/:applicationId` | Obtener el historial de una solicitud      |
 | POST   | `/tracking`                            | Crear un registro de seguimiento           |
 | PATCH  | `/tracking/:id`                        | Actualizar un registro de seguimiento      |
@@ -639,6 +627,44 @@ Los recursos inexistentes generan:
 
 ```text
 404 Not Found
+```
+
+---
+
+# Manejo de errores
+
+Los servicios centralizan la búsqueda de recursos y generan `NotFoundException` cuando un registro no existe.
+
+Por ejemplo:
+
+```text
+GET /students/999
+```
+
+genera:
+
+```text
+404 Not Found
+```
+
+Los parámetros con identificadores inválidos son procesados mediante pipes personalizados.
+
+Por ejemplo:
+
+```text
+GET /students/a
+```
+
+genera:
+
+```text
+400 Bad Request
+```
+
+Los datos que no cumplen las reglas definidas en los DTOs también generan:
+
+```text
+400 Bad Request
 ```
 
 ---
@@ -695,19 +721,19 @@ DATABASE_PASSWORD=change_me
 
 # Ejecución
 
-### Modo desarrollo
+## Modo desarrollo
 
 ```bash
 npm run start
 ```
 
-### Modo watch
+## Modo watch
 
 ```bash
 npm run start:dev
 ```
 
-### Modo producción
+## Modo producción
 
 ```bash
 npm run start:prod
@@ -724,6 +750,64 @@ http://localhost:5500
 # Pruebas con Thunder Client
 
 Las pruebas manuales de la API se realizan mediante **Thunder Client** en Visual Studio Code.
+
+Se verificaron las operaciones CRUD, las validaciones, el manejo de errores y la persistencia de los cinco módulos.
+
+## Students
+
+### Obtener estudiantes
+
+```http
+GET http://localhost:5500/students
+```
+
+### Obtener un estudiante
+
+```http
+GET http://localhost:5500/students/1
+```
+
+### Crear un estudiante
+
+```http
+POST http://localhost:5500/students
+Content-Type: application/json
+```
+
+```json
+{
+  "firstName": "Gabriel",
+  "lastName": "Guaman",
+  "nationalId": "1312345678",
+  "email": "gabriel@example.com",
+  "age": 22,
+  "career": "Ingeniería de Software",
+  "semester": 5,
+  "isActive": true
+}
+```
+
+### Actualizar un estudiante
+
+```http
+PATCH http://localhost:5500/students/1
+Content-Type: application/json
+```
+
+```json
+{
+  "career": "Ingeniería de Software",
+  "semester": 6
+}
+```
+
+### Eliminar un estudiante
+
+```http
+DELETE http://localhost:5500/students/1
+```
+
+---
 
 ## Scholarships
 
@@ -793,6 +877,18 @@ GET http://localhost:5500/applications
 GET http://localhost:5500/applications/1
 ```
 
+### Obtener solicitudes por estudiante
+
+```http
+GET http://localhost:5500/applications/student/1
+```
+
+### Obtener solicitudes por beca
+
+```http
+GET http://localhost:5500/applications/scholarship/1
+```
+
 ### Crear una solicitud
 
 ```http
@@ -851,6 +947,12 @@ DELETE http://localhost:5500/applications/1
 
 ```http
 GET http://localhost:5500/documents
+```
+
+### Obtener un documento
+
+```http
+GET http://localhost:5500/documents/1
 ```
 
 ### Obtener documentos de una solicitud
@@ -966,77 +1068,296 @@ DELETE http://localhost:5500/tracking/1
 
 ---
 
-# Evidencias de validación
+# Evidencias de la entrega
 
-Durante las pruebas con Thunder Client se verificaron casos de éxito y error en los diferentes módulos.
-
-### Ejemplos de respuestas esperadas
+Las evidencias de las pruebas realizadas se encuentran organizadas en:
 
 ```text
-GET /students          → 200 OK
-GET /students/1       → 200 OK
-POST /students        → 201 Created
-
-GET /scholarships     → 200 OK
-GET /scholarships/1   → 200 OK
-POST /scholarships    → 201 Created
-
-GET /applications     → 200 OK
-GET /applications/1   → 200 OK
-POST /applications    → 201 Created
-
-GET /documents        → 200 OK
-POST /documents       → 201 Created
-
-GET /tracking         → 200 OK
-GET /tracking/1       → 200 OK
-POST /tracking        → 201 Created
+Evidencias Entrega 1/
 ```
 
-### Validaciones
-
-También se contemplan casos como:
+La estructura real de evidencias del proyecto es la siguiente:
 
 ```text
-ID inválido              → 400 Bad Request
-Datos inválidos          → 400 Bad Request
-Propiedad no permitida   → 400 Bad Request
-Recurso inexistente      → 404 Not Found
-```
-
-Ejemplo:
-
-```http
-GET /students/a
-```
-
-Respuesta esperada:
-
-```text
-400 Bad Request
-```
-
-Ejemplo:
-
-```http
-GET /students/999
-```
-
-Respuesta esperada:
-
-```text
-404 Not Found
+Evidencias Entrega 1/
+│
+├── 01-Students/
+│   ├── DELETE-Eliminar-Estudiante.png
+│   ├── GET-Actualizado-Estudiantes.png
+│   ├── GET-Listar-Estudiantes.png
+│   ├── GET-Obtener-Estudiante.png
+│   ├── PATCH-Actualizar-Estudiante.png
+│   └── POST-Crear-Estudiante.png
+│
+├── 02-Scholarships/
+│   ├── DELETE-Eliminar-Beca.png
+│   ├── GET-Actualizado-Becas.png
+│   ├── GET-Listar-Becas.png
+│   ├── GET-Obtener-Beca.png
+│   ├── PATCH-Actualizar-Beca.png
+│   └── POST-Crear-Beca.png
+│
+├── 03-Applications/
+│   ├── DELETE-Eliminar-Solicitud.png
+│   ├── GET-Actualizado-Solicitudes.png
+│   ├── GET-Listar-Solicitudes.png
+│   ├── GET-Obtener-Solicitud.png
+│   ├── PATCH-Actualizar-Solicitud.png
+│   └── POST-Crear-Solicitud.png
+│
+├── 04-Documents/
+│   ├── DELETE-Eliminar-Documento.png
+│   ├── GET-Actualizado-Documentos.png
+│   ├── GET-Listar-Documentos.png
+│   ├── GET-Obtener-Documento.png
+│   ├── PATCH-Actualizar-Documento.png
+│   └── POST-Crear-Documento.png
+│
+├── 05-Tracking/
+│   ├── DELETE-Eliminar-Seguimiento.png
+│   ├── GET-Actualizado-Seguimiento.png
+│   ├── GET-Listar-Seguimientos.png
+│   ├── GET-Obtener-Seguimiento.png
+│   ├── PATCH-Actualizar-Seguimiento.png
+│   └── POST-Crear-Seguimiento.png
+│
+├── 06-Validaciones/
+│   ├── DTO-Validacion-Students.png
+│   ├── ID-Invalido-Scholarships.png
+│   └── Recurso-No-Encontrado-Applications.png
+│
+└── 07-Persistencia-PostgreSQL/
+    ├── Actualizar_Pagina_Persiste.png
+    ├── Antes_Registro_BD_Vacio.png
+    ├── Antes_Registro_Vacio.png
+    ├── Datos_Iguales.png
+    ├── Registrar_Datos_BD.png
+    ├── Registrar_Datos_N.png
+    ├── Registrar_Datos_TC.png
+    └── Server_Apagado_BD_Persiste.png
 ```
 
 ---
 
-# Base de datos
+# Evidencias de CRUD
 
-La configuración actual utiliza PostgreSQL y TypeORM.
+Cada módulo cuenta con evidencias de las operaciones principales realizadas mediante Thunder Client.
 
-Al iniciar la aplicación correctamente se verificó que TypeORM pudiera conectarse a PostgreSQL y crear las tablas correspondientes.
+## Students
 
-Las tablas principales actualmente creadas son:
+```text
+01-Students/
+├── DELETE-Eliminar-Estudiante.png
+├── GET-Actualizado-Estudiantes.png
+├── GET-Listar-Estudiantes.png
+├── GET-Obtener-Estudiante.png
+├── PATCH-Actualizar-Estudiante.png
+└── POST-Crear-Estudiante.png
+```
+
+Las evidencias corresponden a:
+
+* Creación de estudiante.
+* Listado de estudiantes.
+* Consulta de estudiante.
+* Actualización de estudiante.
+* Consulta posterior a la actualización.
+* Eliminación de estudiante.
+
+## Scholarships
+
+```text
+02-Scholarships/
+├── DELETE-Eliminar-Beca.png
+├── GET-Actualizado-Becas.png
+├── GET-Listar-Becas.png
+├── GET-Obtener-Beca.png
+├── PATCH-Actualizar-Beca.png
+└── POST-Crear-Beca.png
+```
+
+Las evidencias corresponden a las operaciones CRUD y a la consulta posterior a la actualización.
+
+## Applications
+
+```text
+03-Applications/
+├── DELETE-Eliminar-Solicitud.png
+├── GET-Actualizado-Solicitudes.png
+├── GET-Listar-Solicitudes.png
+├── GET-Obtener-Solicitud.png
+├── PATCH-Actualizar-Solicitud.png
+└── POST-Crear-Solicitud.png
+```
+
+Las evidencias corresponden a las operaciones CRUD y a la consulta posterior a la actualización.
+
+## Documents
+
+```text
+04-Documents/
+├── DELETE-Eliminar-Documento.png
+├── GET-Actualizado-Documentos.png
+├── GET-Listar-Documentos.png
+├── GET-Obtener-Documento.png
+├── PATCH-Actualizar-Documento.png
+└── POST-Crear-Documento.png
+```
+
+Las evidencias corresponden a las operaciones CRUD y a la consulta posterior a la actualización.
+
+## Tracking
+
+```text
+05-Tracking/
+├── DELETE-Eliminar-Seguimiento.png
+├── GET-Actualizado-Seguimiento.png
+├── GET-Listar-Seguimientos.png
+├── GET-Obtener-Seguimiento.png
+├── PATCH-Actualizar-Seguimiento.png
+└── POST-Crear-Seguimiento.png
+```
+
+Las evidencias corresponden a las operaciones CRUD y a la consulta posterior a la actualización.
+
+---
+
+# Evidencias de validación
+
+Durante las pruebas con Thunder Client se verificaron diferentes casos de validación.
+
+Las evidencias se encuentran en:
+
+```text
+06-Validaciones/
+```
+
+La carpeta contiene:
+
+```text
+06-Validaciones/
+├── DTO-Validacion-Students.png
+├── ID-Invalido-Scholarships.png
+└── Recurso-No-Encontrado-Applications.png
+```
+
+## Validación de DTO
+
+Archivo:
+
+```text
+DTO-Validacion-Students.png
+```
+
+Se realizó una prueba con datos inválidos en `Students`.
+
+Respuesta obtenida:
+
+```json
+{
+  "message": [
+    "firstName should not be empty",
+    "lastName should not be empty",
+    "nationalId should not be empty",
+    "email must be an email",
+    "age must not be less than 1",
+    "career should not be empty",
+    "semester must not be less than 1"
+  ],
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+
+## ID inválido
+
+Archivo:
+
+```text
+ID-Invalido-Scholarships.png
+```
+
+Se realizó una prueba de identificador inválido en `Scholarships`.
+
+Respuesta obtenida:
+
+```json
+{
+  "message": "El ID debe ser un número entero positivo",
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+
+## Recurso no encontrado
+
+Archivo:
+
+```text
+Recurso-No-Encontrado-Applications.png
+```
+
+Se realizó una prueba de búsqueda de un recurso inexistente en `Applications`.
+
+Respuesta obtenida:
+
+```json
+{
+  "message": "Solicitud no encontrada",
+  "error": "Not Found",
+  "statusCode": 404
+}
+```
+
+---
+
+# Persistencia en PostgreSQL
+
+La aplicación utiliza PostgreSQL y TypeORM para almacenar los datos.
+
+Los cinco servicios utilizan repositorios de TypeORM:
+
+```text
+StudentsService
+      ↓
+TypeORM Repository<Student>
+      ↓
+PostgreSQL
+```
+
+```text
+ScholarshipsService
+      ↓
+TypeORM Repository<Scholarship>
+      ↓
+PostgreSQL
+```
+
+```text
+ApplicationsService
+      ↓
+TypeORM Repository<Application>
+      ↓
+PostgreSQL
+```
+
+```text
+DocumentsService
+      ↓
+TypeORM Repository<Document>
+      ↓
+PostgreSQL
+```
+
+```text
+TrackingService
+      ↓
+TypeORM Repository<Tracking>
+      ↓
+PostgreSQL
+```
+
+Las tablas principales son:
 
 ```text
 students
@@ -1060,107 +1381,140 @@ synchronize: true
 
 durante el desarrollo local.
 
+Los datos almacenados mediante los repositorios de TypeORM permanecen en PostgreSQL y no dependen de arreglos o almacenamiento temporal en memoria.
+
+La persistencia fue verificada mediante pruebas realizadas desde Thunder Client y comprobaciones en PostgreSQL.
+
+También se verificó que los registros permanecen disponibles después de detener y volver a iniciar la aplicación.
+
+## Evidencias de persistencia
+
+Las evidencias se encuentran en:
+
+```text
+07-Persistencia-PostgreSQL/
+```
+
+Contenido:
+
+```text
+07-Persistencia-PostgreSQL/
+├── Actualizar_Pagina_Persiste.png
+├── Antes_Registro_BD_Vacio.png
+├── Antes_Registro_Vacio.png
+├── Datos_Iguales.png
+├── Registrar_Datos_BD.png
+├── Registrar_Datos_N.png
+├── Registrar_Datos_TC.png
+└── Server_Apagado_BD_Persiste.png
+```
+
+Estas evidencias documentan el proceso de registro, almacenamiento y comprobación de los datos entre Thunder Client, la aplicación y PostgreSQL, incluyendo la verificación de persistencia después de reiniciar el servidor.
+
 ---
 
 # Estado actual del proyecto
 
 Actualmente se encuentran implementados:
 
-* [x] Configuración inicial de NestJS.
-* [x] Arquitectura modular.
-* [x] Módulo `students`.
-* [x] CRUD de `students`.
-* [x] DTOs de `students`.
-* [x] Validaciones de `students`.
-* [x] Pipe para validar IDs de `students`.
-* [x] Módulo `scholarships`.
-* [x] CRUD de `scholarships`.
-* [x] DTOs de `scholarships`.
-* [x] Validaciones de `scholarships`.
-* [x] Pipe para validar IDs de `scholarships`.
-* [x] Módulo `applications`.
-* [x] CRUD de `applications`.
-* [x] DTOs de `applications`.
-* [x] Validaciones de `applications`.
-* [x] Pipe para validar IDs de `applications`.
-* [x] Módulo `documents`.
-* [x] CRUD de `documents`.
-* [x] DTOs de `documents`.
-* [x] Validaciones de `documents`.
-* [x] Pipe para validar IDs de `documents`.
-* [x] Módulo `tracking`.
-* [x] CRUD de `tracking`.
-* [x] DTOs de `tracking`.
-* [x] Validaciones de `tracking`.
-* [x] Pipe para validar IDs de `tracking`.
-* [x] Pruebas manuales con Thunder Client.
-* [x] Instalación de dependencias de PostgreSQL y TypeORM.
-* [x] Configuración de variables de entorno.
-* [x] Configuración de `ConfigModule`.
-* [x] Configuración de `TypeOrmModule`.
-* [x] Entidad TypeORM de `students`.
-* [x] Entidad TypeORM de `scholarships`.
-* [x] Entidad TypeORM de `applications`.
-* [x] Entidad TypeORM de `documents`.
-* [x] Entidad TypeORM de `tracking`.
-* [x] Creación de la tabla `students`.
-* [x] Creación de la tabla `scholarships`.
-* [x] Creación de la tabla `applications`.
-* [x] Creación de la tabla `documents`.
-* [x] Creación de la tabla `tracking`.
-* [x] Conexión de desarrollo con PostgreSQL.
-* [x] Compilación exitosa del proyecto con TypeORM.
-
-### Pendiente
-
-* [ ] Verificar la persistencia mediante repositorios TypeORM en los módulos que todavía utilicen almacenamiento temporal.
-* [ ] Verificar las operaciones CRUD de cada módulo directamente contra PostgreSQL.
-* [ ] Definir relaciones TypeORM explícitas (`@ManyToOne`, `@OneToMany`) si son requeridas por el diseño final.
-* [ ] Verificar la persistencia de los registros después de reiniciar la aplicación.
-* [ ] Realizar pruebas de integración con la base de datos.
-* [ ] Completar la documentación final de evidencias.
-* [ ] Preparar migraciones para un entorno de producción.
+* Configuración inicial de NestJS.
+* Arquitectura modular.
+* Módulo `students`.
+* CRUD de `students`.
+* DTOs de `students`.
+* Validaciones de `students`.
+* Pipe para validar IDs de `students`.
+* Módulo `scholarships`.
+* CRUD de `scholarships`.
+* DTOs de `scholarships`.
+* Validaciones de `scholarships`.
+* Pipe para validar IDs de `scholarships`.
+* Módulo `applications`.
+* CRUD de `applications`.
+* DTOs de `applications`.
+* Validaciones de `applications`.
+* Pipe para validar IDs de `applications`.
+* Módulo `documents`.
+* CRUD de `documents`.
+* DTOs de `documents`.
+* Validaciones de `documents`.
+* Pipe para validar IDs de `documents`.
+* Módulo `tracking`.
+* CRUD de `tracking`.
+* DTOs de `tracking`.
+* Validaciones de `tracking`.
+* Pipe para validar IDs de `tracking`.
+* Pruebas manuales mediante Thunder Client.
+* Instalación de dependencias de PostgreSQL y TypeORM.
+* Configuración de variables de entorno.
+* Configuración de `ConfigModule`.
+* Configuración de `TypeOrmModule`.
+* Entidad TypeORM de `students`.
+* Entidad TypeORM de `scholarships`.
+* Entidad TypeORM de `applications`.
+* Entidad TypeORM de `documents`.
+* Entidad TypeORM de `tracking`.
+* Creación de las tablas correspondientes en PostgreSQL.
+* Conexión de desarrollo con PostgreSQL.
+* Repositorios TypeORM en los cinco servicios.
+* Operaciones CRUD mediante repositorios TypeORM.
+* Manejo de recursos inexistentes mediante `NotFoundException`.
+* Validación global mediante `ValidationPipe`.
+* Verificación de los endpoints mediante Thunder Client.
+* Verificación de persistencia de los registros en PostgreSQL.
+* Verificación de persistencia después de reiniciar la aplicación.
+* Evidencias de CRUD.
+* Evidencias de validaciones.
+* Evidencias de persistencia en PostgreSQL.
+* Organización de evidencias de la entrega.
+* Documentación de las evidencias.
+* Compilación del proyecto con TypeORM.
 
 ---
 
 # Próximos pasos
 
-1. Verificar los repositorios TypeORM de cada módulo.
-2. Comprobar las operaciones CRUD directamente en PostgreSQL.
-3. Verificar las relaciones entre estudiantes, solicitudes, becas, documentos y seguimientos.
-4. Mantener el mismo contrato HTTP de los endpoints.
-5. Verificar la persistencia después de reiniciar la aplicación.
-6. Realizar pruebas de integración.
-7. Actualizar las evidencias del proyecto.
-8. Completar la documentación final.
+Para esta primera etapa, las funcionalidades principales del backend se encuentran implementadas y documentadas.
+
+Como posibles mejoras para futuras etapas se pueden considerar:
+
+1. Implementar relaciones explícitas de TypeORM mediante `@ManyToOne` y `@OneToMany`, si son requeridas por la siguiente etapa del proyecto.
+2. Implementar migraciones para controlar los cambios del esquema en ambientes de producción.
+3. Incorporar pruebas automatizadas unitarias y end-to-end.
+4. Incorporar autenticación y autorización.
+5. Implementar funcionalidades adicionales del sistema de gestión de becas.
 
 ---
 
 # Pruebas de NestJS
 
-Para ejecutar las pruebas unitarias:
+El proyecto dispone de los comandos de prueba proporcionados por NestJS:
+
+### Pruebas unitarias
 
 ```bash
 npm run test
 ```
 
-Para ejecutar las pruebas end-to-end:
+### Pruebas end-to-end
 
 ```bash
 npm run test:e2e
 ```
 
-Para obtener el reporte de cobertura:
+### Reporte de cobertura
 
 ```bash
 npm run test:cov
 ```
 
+Estos comandos pueden utilizarse para ampliar posteriormente la cobertura de pruebas automatizadas del proyecto.
+
 ---
 
 # Recursos
 
-* [NestJS Documentation](https://docs.nestjs.com)
+* [NestJS Documentation](https://docs.nestjs.com/)
 * [NestJS GitHub](https://github.com/nestjs/nest)
 * [NestJS Courses](https://courses.nestjs.com/)
 * [NestJS Devtools](https://devtools.nestjs.com/)
@@ -1169,6 +1523,6 @@ npm run test:cov
 
 # Autoría
 
-Proyecto académico desarrollado para la asignatura de Desarrollo Backend Web.
+Proyecto académico desarrollado para la asignatura de **Desarrollo Backend Web**.
 
 **ULEAM — Universidad Laica Eloy Alfaro de Manabí**
