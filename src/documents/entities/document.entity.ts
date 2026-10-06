@@ -1,19 +1,42 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-export type DocumentStatus = 'pendiente' | 'cargado' | 'observado' | 'aprobado';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import type { Relation } from 'typeorm';
+import type { Application } from '../../applications/entities/application.entity.js';
+
+export type DocumentStatus =
+  | 'pendiente'
+  | 'cargado'
+  | 'observado'
+  | 'aprobado';
+
 @Entity('documents')
-export class Document {
-  @PrimaryGeneratedColumn()
-  id: number;
-  @Column()
-  applicationId: number;
-  @Column()
-  name: string;
-  @Column({ nullable: true })
-  url?: string;
-  @Column({
-    type: 'enum',
-    enum: ['pendiente', 'cargado', 'observado', 'aprobado'],
-    default: 'pendiente',
-  })
-  status: DocumentStatus;
+  export class Document {
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
+    applicationId: number;
+
+    @Column()
+    name: string;
+
+    @Column({ nullable: true })
+    url?: string;
+
+    @Column({
+      type: 'enum',
+      enum: ['pendiente', 'cargado', 'observado', 'aprobado'],
+      default: 'pendiente',
+    })
+    status: DocumentStatus;
+
+    @ManyToOne(
+      'Application',
+      'documents',
+      {
+        nullable: false,
+        onDelete: 'CASCADE',
+      },
+    )
+    @JoinColumn({ name: 'applicationId' })
+    application: Relation<Application>;
 }
