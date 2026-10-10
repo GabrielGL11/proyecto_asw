@@ -1,16 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ScholarshipsService } from './scholarships.service.js';
 import { CreateScholarshipDto } from './dto/create-scholarship.dto.js';
 import { UpdateScholarshipDto } from './dto/update-scholarship.dto.js';
+import { ScholarshipsQueryDto } from './dto/scholarships-query.dto.js';
 import { ParseScholarshipIdPipe } from './pipes/parse-scholarship-id.pipe.js';
+
 @Controller('scholarships')
     export class ScholarshipsController {
     constructor(
         private readonly scholarshipsService: ScholarshipsService,
     ) {}
     @Get()
-    findAll() {
-        return this.scholarshipsService.findAll();
+    findAll(@Query() query: ScholarshipsQueryDto) {
+        return this.scholarshipsService.findAll(query);
     }
     @Get(':id')
     findOne(@Param('id', ParseScholarshipIdPipe) id: number) {

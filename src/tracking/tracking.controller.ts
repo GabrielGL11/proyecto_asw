@@ -1,39 +1,41 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { TrackingService } from './tracking.service.js';
 import { CreateTrackingDto } from './dto/create-tracking.dto.js';
 import { UpdateTrackingDto } from './dto/update-tracking.dto.js';
-import { ParseTrackingIdPipe } from './pipes/parse-tracking-id.pipe.js';
+import { TrackingQueryDto } from './dto/tracking-query.dto.js';
 
 @Controller('tracking')
-export class TrackingController {
+    export class TrackingController {
     constructor(
-    private readonly trackingService: TrackingService,
+        private readonly trackingService: TrackingService,
     ) {}
+    @Post()
+    create(@Body() dto: CreateTrackingDto) {
+        return this.trackingService.create(dto);
+    }
     @Get()
-    findAll() {
-    return this.trackingService.findAll();
+    findAll(@Query() query: TrackingQueryDto) {
+        return this.trackingService.findAll(query);
     }
     @Get('application/:applicationId')
-    findByApplication(@Param('applicationId', ParseIntPipe) applicationId: number) {
-    return this.trackingService.findByApplication(applicationId);
+    findByApplication(
+        @Param('applicationId', ParseIntPipe) applicationId: number,
+    ) {
+        return this.trackingService.findByApplication(applicationId);
     }
     @Get(':id')
-    findOne(@Param('id', ParseTrackingIdPipe) id: number) {
-    return this.trackingService.findOne(id);
-    }
-    @Post()
-    create(@Body() createTrackingDto: CreateTrackingDto) {
-    return this.trackingService.create(createTrackingDto);
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.trackingService.findOne(id);
     }
     @Patch(':id')
     update(
-    @Param('id', ParseTrackingIdPipe) id: number,
-    @Body() updateTrackingDto: UpdateTrackingDto,
+        @Param('id', ParseIntPipe) id: number,
+        @Body() dto: UpdateTrackingDto,
     ) {
-    return this.trackingService.update(id, updateTrackingDto);
+        return this.trackingService.update(id, dto);
     }
     @Delete(':id')
-    remove(@Param('id', ParseTrackingIdPipe) id: number) {
-    return this.trackingService.remove(id);
+    remove(@Param('id', ParseIntPipe) id: number) {
+        return this.trackingService.remove(id);
     }
 }

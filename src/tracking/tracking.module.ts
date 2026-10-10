@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TrackingController } from './tracking.controller.js';
 import { TrackingService } from './tracking.service.js';
+import { TrackingController } from './tracking.controller.js';
 import { Tracking } from './entities/tracking.entity.js';
+import { Application } from '../applications/entities/application.entity.js';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Tracking])],
+  imports: [
+    TypeOrmModule.forFeature([Tracking, Application]),
+  ],
   controllers: [TrackingController],
   providers: [TrackingService],
 })
