@@ -10,6 +10,8 @@ import { StudentsModule } from './students/students.module.js';
 import { ApplicationsModule } from './applications/applications.module.js';
 import { DocumentsModule } from './documents/documents.module.js';
 import { TrackingModule } from './tracking/tracking.module.js';
+import { AuthModule } from './auth/auth.module.js';
+import { User } from './users/entities/user.entity.js';
 
 @Module({
   imports: [
@@ -27,8 +29,9 @@ import { TrackingModule } from './tracking/tracking.module.js';
         username: config.get<string>('DATABASE_USER'),
         password: config.get<string>('DATABASE_PASSWORD'),
         database: config.get<string>('DATABASE_NAME'),
+        entities: [User],
         autoLoadEntities: true,
-        synchronize: true, // Solo para desarrollo
+        synchronize: false,
       }),
     }),
 
@@ -37,6 +40,7 @@ import { TrackingModule } from './tracking/tracking.module.js';
     ApplicationsModule,
     DocumentsModule,
     TrackingModule,
+    AuthModule,
   ],
 
   controllers: [AppController],

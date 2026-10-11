@@ -1,13 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApplicationsService } from './applications.service.js';
 import { CreateApplicationDto } from './dto/create-application.dto.js';
 import { UpdateApplicationDto } from './dto/update-application.dto.js';
 import { ParseApplicationIdPipe } from './pipes/parse-application-id.pipe.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 
 @Controller('applications')
 export class ApplicationsController {
   constructor(private readonly applicationsService: ApplicationsService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createApplicationDto: CreateApplicationDto) {
     return this.applicationsService.create(createApplicationDto);
@@ -33,16 +35,19 @@ export class ApplicationsController {
     return this.applicationsService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id', ParseApplicationIdPipe) id: number, @Body() updateApplicationDto: UpdateApplicationDto) {
     return this.applicationsService.update(id, updateApplicationDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id/status')
   updateStatus(@Param('id', ParseApplicationIdPipe) id: number, @Body('status') status: string) {
     return this.applicationsService.updateStatus(id, status as any);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id', ParseApplicationIdPipe) id: number) {
     return this.applicationsService.remove(id);
