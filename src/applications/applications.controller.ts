@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { ApplicationsService } from './applications.service.js';
 import { CreateApplicationDto } from './dto/create-application.dto.js';
+import { ApplicationsQueryDto } from './dto/applications-query.dto.js';
 import { UpdateApplicationDto } from './dto/update-application.dto.js';
 import { ParseApplicationIdPipe } from './pipes/parse-application-id.pipe.js';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 
 @Controller('applications')
 export class ApplicationsController {
@@ -16,8 +17,8 @@ export class ApplicationsController {
   }
 
   @Get()
-  findAll() {
-    return this.applicationsService.findAll();
+  findAll(@Query() query: ApplicationsQueryDto) {
+    return this.applicationsService.findAll(query);
   }
 
   @Get('student/:studentId')

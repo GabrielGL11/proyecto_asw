@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { DocumentsService } from './documents.service.js';
 import { CreateDocumentDto } from './dto/create-document.dto.js';
+import { DocumentsQueryDto } from './dto/documents-query.dto.js';
 import { UpdateDocumentDto } from './dto/update-document.dto.js';
 import { ParseDocumentIdPipe } from './pipes/parse-document-id.pipe.js';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 
 @Controller('documents')
 export class DocumentsController {
@@ -16,8 +17,8 @@ export class DocumentsController {
   }
 
   @Get()
-  findAll() {
-    return this.documentsService.findAll();
+  findAll(@Query() query: DocumentsQueryDto) {
+    return this.documentsService.findAll(query);
   }
 
   @Get('application/:applicationId')

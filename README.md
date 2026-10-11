@@ -18,88 +18,170 @@
     <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
   <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
 </p>
+
 # Sistema de Gestión de Becas ULEAM
 
-Backend desarrollado con **NestJS + TypeScript** para la gestión de becas estudiantiles de la Universidad Laica Eloy Alfaro de Manabí (ULEAM).
+Backend desarrollado con **NestJS, TypeScript, TypeORM y PostgreSQL** para administrar las becas estudiantiles de la Universidad Laica Eloy Alfaro de Manabí (ULEAM).
+
+El proyecto se desarrolla de manera incremental para la asignatura de **Desarrollo Backend Web con NestJS**, manteniendo la continuidad de la primera etapa e incorporando persistencia relacional, consultas avanzadas y validaciones.
+
+Repositorio: [GabrielGL11/proyecto_asw](https://github.com/GabrielGL11/proyecto_asw)
 
 ---
 
-## Descripción
+## 1. Descripción del proyecto
 
-El proyecto forma parte del trabajo autónomo de **Desarrollo Backend Web con NestJS**.
+El Sistema de Gestión de Becas ULEAM permite administrar los principales recursos del proceso de becas universitarias:
 
-El sistema permite gestionar el proceso de becas universitarias mediante diferentes recursos relacionados:
+- Estudiantes.
+- Becas.
+- Solicitudes de becas.
+- Documentos.
+- Seguimiento de solicitudes.
 
-* Estudiantes.
-* Becas.
-* Solicitudes de becas.
-* Documentos.
-* Seguimiento de solicitudes.
+La API utiliza una arquitectura modular basada en NestJS. Los datos se almacenan en PostgreSQL y se administran mediante TypeORM.
 
-La aplicación utiliza una arquitectura modular basada en NestJS, PostgreSQL como sistema de persistencia y TypeORM como ORM.
+Actualmente, el proyecto cuenta con cinco módulos principales, operaciones CRUD definidas, relaciones entre entidades, validaciones, manejo de errores y funcionalidades de búsqueda, filtrado, ordenamiento y paginación.
 
-El proyecto mantiene la continuidad de la Etapa 1 y actualmente incorpora relaciones persistentes entre las principales entidades del dominio.
-
----
-
-# Etapas del proyecto
-
-## Etapa 1 — Fundamentos y definición de la API
-
-En la primera etapa se implementaron:
-
-* Arquitectura modular con NestJS.
-* Módulos para estudiantes, becas, solicitudes, documentos y seguimiento.
-* Operaciones CRUD.
-* DTOs.
-* Validaciones mediante `class-validator`.
-* `ValidationPipe` global.
-* Pipes personalizados para validar identificadores.
-* Manejo de errores `400 Bad Request` y `404 Not Found`.
-* Persistencia mediante PostgreSQL.
-* Integración con TypeORM.
-* Variables de entorno.
-* Pruebas manuales mediante Thunder Client.
-* Evidencias de las operaciones CRUD y persistencia.
-
-## Etapa 2 — Modelo relacional y autenticación
-
-La segunda etapa amplía la implementación anterior.
-
-Actualmente ya se implementó la parte correspondiente al **modelo relacional y persistencia relacionada**, incluyendo:
-
-* Relaciones `@ManyToOne` y `@OneToMany`.
-* Claves foráneas mediante TypeORM.
-* Integridad referencial.
-* Reglas de eliminación.
-* Consultas de información relacionada.
-* Validación de existencia de Student y Scholarship al crear Application.
-* Validación de estudiante activo.
-* Prevención de solicitudes duplicadas.
-* Persistencia de las relaciones en PostgreSQL.
-* Verificación de persistencia después de reiniciar la aplicación.
-* Consultas de Applications por estudiante y por beca.
-
-Quedan pendientes para completar la Etapa 2:
-
-* Búsqueda avanzada.
-* Filtros mediante query params.
-* Paginación.
-* Ordenamiento.
-* Metadatos de paginación.
-* Migraciones de TypeORM.
-* Módulo de usuarios.
-* Registro de usuarios.
-* Hash de contraseñas.
-* Login.
-* Emisión de JWT.
-* Protección de rutas mediante JWT.
+La autenticación mediante usuarios y JWT, así como las migraciones para la entrega final, continúan pendientes de implementación.
 
 ---
 
-# Modelo relacional
+## 2. Estado de las etapas
 
-Las entidades principales del sistema mantienen las siguientes relaciones:
+### Etapa 1 — Fundamentos y definición de la API
+
+Esta etapa estableció la estructura inicial de la aplicación.
+
+Funcionalidades implementadas:
+
+- Arquitectura modular con NestJS.
+- Módulos de estudiantes, becas, solicitudes, documentos y seguimiento.
+- Entidades de TypeORM.
+- DTOs para creación y actualización.
+- Validaciones mediante `class-validator`.
+- `ValidationPipe` global.
+- Pipes para validar identificadores.
+- Operaciones CRUD en los cinco controladores.
+- Integración con PostgreSQL.
+- Configuración mediante variables de entorno.
+- Manejo de errores HTTP.
+- Pruebas manuales de los endpoints.
+
+### Etapa 2 — Modelo relacional, consultas y autenticación
+
+La segunda etapa continúa el proyecto anterior, ampliando su modelo de datos y las funcionalidades de consulta.
+
+**Implementado hasta el momento:**
+
+- Relaciones `@ManyToOne` y `@OneToMany`.
+- Claves foráneas entre las entidades.
+- Consultas con información relacionada.
+- Validación de existencia de estudiantes y becas al crear solicitudes.
+- Validación de estudiantes activos.
+- Prevención de solicitudes duplicadas.
+- Consultas de solicitudes por estudiante y por beca.
+- Filtros mediante parámetros de consulta.
+- Búsqueda por texto en los módulos correspondientes.
+- Paginación.
+- Ordenamiento ascendente y descendente.
+- Metadatos de paginación.
+- Validación de parámetros de consulta.
+- Rechazo de propiedades no permitidas.
+- Pruebas de compilación, consultas, filtros y respuestas de error.
+
+**Pendiente para completar la etapa:**
+
+- Implementación y validación final de migraciones de TypeORM.
+- Configuración de entrega con `synchronize: false`.
+- Módulo de usuarios.
+- Registro de usuarios.
+- Hash de contraseñas.
+- Inicio de sesión.
+- Generación y validación de JWT.
+- Protección de al menos dos endpoints de escritura.
+- Pruebas completas de CRUD, integridad referencial y eliminación.
+- Evidencias finales y documento de entrega.
+
+---
+
+## 3. Tecnologías utilizadas
+
+- Node.js
+- NestJS
+- TypeScript
+- PostgreSQL
+- TypeORM
+- `pg`
+- `@nestjs/config`
+- `@nestjs/typeorm`
+- `class-validator`
+- `class-transformer`
+- `@nestjs/mapped-types`
+- npm
+- Thunder Client
+
+Las dependencias necesarias para autenticación, como las de JWT y hash de contraseñas, se incorporarán cuando se implemente esa parte del proyecto.
+
+---
+
+## 4. Arquitectura del sistema
+
+El proyecto sigue una arquitectura modular. Cada recurso separa sus responsabilidades mediante controladores, servicios, DTOs y entidades.
+
+```text
+src/
+├── students/
+├── scholarships/
+├── applications/
+├── documents/
+├── tracking/
+├── app.module.ts
+├── app.controller.ts
+├── app.service.ts
+└── main.ts
+```
+
+Cada módulo de recurso contiene, según corresponda:
+
+```text
+modulo/
+├── dto/
+├── entities/
+├── pipes/
+├── modulo.controller.ts
+├── modulo.service.ts
+└── modulo.module.ts
+```
+
+### Responsabilidades
+
+- **Controller:** expone los endpoints HTTP y recibe los parámetros y cuerpos de las peticiones.
+- **Service:** implementa la lógica de negocio y las operaciones sobre los datos.
+- **DTO:** define la estructura de entrada y las reglas de validación.
+- **Pipe:** valida y transforma parámetros cuando corresponde.
+- **Entity:** representa las tablas y las relaciones administradas por TypeORM.
+- **Repository:** permite consultar, insertar, actualizar y eliminar registros.
+
+### Flujo de persistencia
+
+```text
+Cliente HTTP
+    ↓
+Controller
+    ↓
+Service
+    ↓
+TypeORM Repository
+    ↓
+PostgreSQL
+```
+
+---
+
+## 5. Modelo relacional
+
+Las cinco entidades principales se relacionan de la siguiente manera:
 
 ```text
 Student 1:N Application N:1 Scholarship
@@ -116,289 +198,413 @@ Student
    │
    │ 1:N
    ▼
-Application
+Application ◄──── N:1 ──── Scholarship
    │
-   ├── N:1 ──> Scholarship
+   ├── 1:N ──► Document
    │
-   ├── 1:N ──> Document
-   │
-   └── 1:N ──> Tracking
+   └── 1:N ──► Tracking
 ```
 
-Estas relaciones se encuentran implementadas mediante TypeORM y PostgreSQL.
+### Student — Application
+
+Un estudiante puede registrar varias solicitudes de beca.
+
+La entidad `Application` mantiene la clave foránea del estudiante mediante `studentId`.
+
+### Scholarship — Application
+
+Una beca puede estar relacionada con varias solicitudes.
+
+La entidad `Application` mantiene la clave foránea de la beca mediante `scholarshipId`.
+
+### Application — Document
+
+Una solicitud puede tener varios documentos asociados mediante `applicationId`.
+
+### Application — Tracking
+
+Una solicitud puede tener varios registros de seguimiento mediante `applicationId`.
+
+Las relaciones se representan en TypeORM mediante decoradores como `@ManyToOne` y `@OneToMany`.
+
+### Reglas de eliminación
+
+La configuración de las relaciones contempla reglas de integridad referencial:
+
+- Las relaciones de `Application` con `Student` y `Scholarship` utilizan `RESTRICT`, según la configuración documentada de las entidades.
+- Las relaciones de `Document` y `Tracking` con `Application` utilizan `CASCADE`, según la configuración documentada.
+
+Estas reglas deben mantenerse alineadas con las restricciones reales de PostgreSQL y verificarse mediante pruebas de eliminación antes de dar por finalizada la entrega.
 
 ---
 
-# Relaciones implementadas
+## 6. Entidades del sistema
 
-## Student → Application
+### 6.1. Students
 
-Un estudiante puede tener varias solicitudes de beca.
+Representa a los estudiantes que pueden solicitar becas.
+
+Campos principales:
 
 ```text
-Student 1:N Application
+id
+firstName
+lastName
+nationalId
+email
+age
+career
+semester
+isActive
 ```
 
-La entidad `Student` utiliza:
+Tabla: `students`.
 
-```ts
-@OneToMany('Application', 'student')
-applications: Relation<Application[]>;
+El correo electrónico se encuentra configurado como único.
+
+### 6.2. Scholarships
+
+Representa las becas disponibles.
+
+Campos principales:
+
+```text
+id
+name
+description
+amount
+startDate
+endDate
+isActive
 ```
 
-La entidad `Application` utiliza:
+Tabla: `scholarships`.
 
-```ts
-@ManyToOne('Student', 'applications', {
-  nullable: false,
-  onDelete: 'RESTRICT',
-})
+### 6.3. Applications
+
+Representa las solicitudes de becas.
+
+Campos principales:
+
+```text
+id
+studentId
+scholarshipId
+gpa
+income
+comment
+status
 ```
 
-La relación utiliza `studentId` como clave foránea.
+Tabla: `applications`.
+
+Estados utilizados:
+
+```text
+pendiente
+revision
+aprobada
+rechazada
+correccion
+```
+
+Reglas de negocio implementadas:
+
+- El estudiante debe existir.
+- La beca debe existir.
+- El estudiante debe estar activo para registrar una solicitud.
+- No se permite más de una solicitud del mismo estudiante para la misma beca.
+- Se comprueba la existencia de los registros relacionados antes de crear una solicitud.
+
+La combinación de estudiante y beca utiliza una restricción única compuesta, complementada con una comprobación en el servicio.
+
+### 6.4. Documents
+
+Representa los documentos asociados a las solicitudes.
+
+Campos principales:
+
+```text
+id
+applicationId
+name
+url
+status
+```
+
+Tabla: `documents`.
+
+Estados utilizados:
+
+```text
+pendiente
+cargado
+observado
+aprobado
+```
+
+### 6.5. Tracking
+
+Representa el historial de seguimiento de las solicitudes.
+
+Campos principales:
+
+```text
+id
+applicationId
+status
+comment
+createdAt
+```
+
+Tabla: `tracking`.
+
+Los registros de seguimiento permiten consultar el historial relacionado con una solicitud.
 
 ---
 
-## Scholarship → Application
+## 7. CRUD y endpoints disponibles
 
-Una beca puede tener varias solicitudes.
+Los controladores exponen operaciones para crear, consultar, actualizar y eliminar registros. La existencia de estas rutas no sustituye las pruebas funcionales completas de cada operación.
 
-```text
-Scholarship 1:N Application
-```
+### Students
 
-La entidad `Scholarship` utiliza:
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/students` | Consultar estudiantes con filtros y paginación |
+| GET | `/students/:id` | Consultar un estudiante por ID |
+| POST | `/students` | Crear un estudiante |
+| PATCH | `/students/:id` | Actualizar un estudiante |
+| DELETE | `/students/:id` | Eliminar un estudiante |
 
-```ts
-@OneToMany('Application', 'scholarship')
-applications: Relation<Application[]>;
-```
+### Scholarships
 
-La entidad `Application` utiliza:
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/scholarships` | Consultar becas con filtros y paginación |
+| GET | `/scholarships/:id` | Consultar una beca por ID |
+| POST | `/scholarships` | Crear una beca |
+| PATCH | `/scholarships/:id` | Actualizar una beca |
+| DELETE | `/scholarships/:id` | Eliminar una beca |
 
-```ts
-@ManyToOne('Scholarship', 'applications', {
-  nullable: false,
-  onDelete: 'RESTRICT',
-})
-```
+### Applications
 
-La relación utiliza `scholarshipId` como clave foránea.
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/applications` | Consultar solicitudes con filtros y paginación |
+| GET | `/applications/:id` | Consultar una solicitud con sus relaciones |
+| GET | `/applications/student/:studentId` | Consultar solicitudes de un estudiante |
+| GET | `/applications/scholarship/:scholarshipId` | Consultar solicitudes de una beca |
+| POST | `/applications` | Crear una solicitud |
+| PATCH | `/applications/:id` | Actualizar una solicitud |
+| PATCH | `/applications/:id/status` | Cambiar el estado de una solicitud |
+| DELETE | `/applications/:id` | Eliminar una solicitud |
 
----
+### Documents
 
-## Application → Document
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/documents` | Consultar documentos con filtros y paginación |
+| GET | `/documents/:id` | Consultar un documento por ID |
+| GET | `/documents/application/:applicationId` | Consultar documentos de una solicitud |
+| POST | `/documents` | Crear un documento |
+| PATCH | `/documents/:id` | Actualizar un documento |
+| PATCH | `/documents/:id/status` | Cambiar el estado de un documento |
+| DELETE | `/documents/:id` | Eliminar un documento |
 
-Una solicitud puede tener varios documentos.
+### Tracking
 
-```text
-Application 1:N Document
-```
-
-La relación utiliza:
-
-```ts
-@OneToMany('Document', 'application')
-documents: Relation<Document[]>;
-```
-
-y:
-
-```ts
-@ManyToOne('Application', 'documents', {
-  nullable: false,
-  onDelete: 'CASCADE',
-})
-```
-
-Cuando una solicitud se elimina, sus documentos relacionados se eliminan mediante `CASCADE`.
-
----
-
-## Application → Tracking
-
-Una solicitud puede tener varios registros de seguimiento.
-
-```text
-Application 1:N Tracking
-```
-
-La relación utiliza:
-
-```ts
-@OneToMany('Tracking', 'application')
-trackings: Relation<Tracking[]>;
-```
-
-y:
-
-```ts
-@ManyToOne('Application', 'trackings', {
-  nullable: false,
-  onDelete: 'CASCADE',
-})
-```
-
-Cuando una solicitud se elimina, sus registros de seguimiento relacionados se eliminan mediante `CASCADE`.
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/tracking` | Consultar seguimientos con filtros y paginación |
+| GET | `/tracking/:id` | Consultar un seguimiento por ID |
+| GET | `/tracking/application/:applicationId` | Consultar seguimientos de una solicitud |
+| POST | `/tracking` | Crear un seguimiento |
+| PATCH | `/tracking/:id` | Actualizar un seguimiento |
+| DELETE | `/tracking/:id` | Eliminar un seguimiento |
 
 ---
 
-# Integridad y reglas de negocio
+## 8. Búsqueda, filtros, ordenamiento y paginación
 
-El sistema incorpora reglas de negocio para la creación de solicitudes.
+Los cinco módulos cuentan con DTOs de consulta para validar los parámetros recibidos mediante query params.
 
-### Estudiante inexistente
+Las consultas se construyen en los servicios utilizando TypeORM y sus repositorios.
 
-Si el estudiante indicado no existe:
+### Funcionalidades implementadas
 
-```text
-404 Not Found
+- Búsqueda por texto en los módulos que la admiten.
+- Filtros por campos específicos de cada recurso.
+- Filtros por identificadores relacionados.
+- Ordenamiento ascendente (`ASC`) y descendente (`DESC`).
+- Paginación mediante `page` y `limit`.
+- Validación del número de página y del límite.
+- Restricción del tamaño máximo de página a 50 registros.
+- Validación de campos permitidos para ordenar.
+- Metadatos con el total de registros y páginas.
+
+### Ejemplo de consulta de becas
+
+```http
+GET /scholarships?search=beca&isActive=true&page=1&limit=5&sortBy=name&order=ASC
 ```
 
-Mensaje:
+### Ejemplo de consulta de estudiantes
 
-```text
-Estudiante no encontrado
+```http
+GET /students?career=Software&semester=5&isActive=true&page=1&limit=5&sortBy=lastName&order=ASC
 ```
 
-### Beca inexistente
+### Ejemplo de consulta de solicitudes
 
-Si la beca indicada no existe:
-
-```text
-404 Not Found
+```http
+GET /applications?studentId=1&scholarshipId=1&status=pendiente&page=1&limit=5&sortBy=gpa&order=DESC
 ```
 
-Mensaje:
+### Ejemplo de consulta de documentos
 
-```text
-Beca no encontrada
+```http
+GET /documents?applicationId=1&status=pendiente&page=1&limit=5&sortBy=name&order=ASC
 ```
 
-### Estudiante inactivo
+### Ejemplo de consulta de seguimiento
 
-Un estudiante inactivo no puede registrar una nueva solicitud:
-
-```text
-400 Bad Request
+```http
+GET /tracking?applicationId=1&status=revision&page=1&limit=5&sortBy=createdAt&order=DESC
 ```
 
-Mensaje:
+Los nombres y valores de los parámetros deben corresponder a los definidos en el DTO de cada módulo.
 
-```text
-El estudiante está inactivo y no puede solicitar una beca
+### Estructura de respuesta
+
+Las consultas paginadas utilizan una estructura general como la siguiente:
+
+```json
+{
+  "items": [],
+  "meta": {
+    "total": 2,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1
+  }
+}
 ```
 
-### Solicitud duplicada
+Donde:
 
-Un estudiante no puede registrar dos solicitudes para la misma beca.
+- `items`: registros correspondientes a la página solicitada.
+- `total`: cantidad total de registros que cumplen los filtros.
+- `page`: página actual.
+- `limit`: cantidad máxima de registros solicitados.
+- `totalPages`: número total de páginas calculado a partir del total y el límite.
 
-La entidad `Application` utiliza una restricción única compuesta:
+### Ejemplo de paginación
+
+```http
+GET /documents?page=1&limit=1
+GET /documents?page=2&limit=1
+```
+
+Estas consultas permiten verificar que los registros se distribuyen entre páginas y que los metadatos se actualizan según el resultado.
+
+### Semana 6 — Consultas de datos
+
+Contrato común de los listados (`/students`, `/scholarships`, `/applications`, `/documents`, `/tracking`):
+
+| Parámetro | Regla | Valor por defecto |
+|---|---|---|
+| `page` | Entero ≥ 1 | `1` |
+| `limit` | Entero de 1 a 50 | `10` |
+| `sortBy` | Solo campos de la lista permitida de cada recurso | `id` |
+| `order` | `ASC` o `DESC` | `ASC` |
+
+Un valor inválido o un parámetro desconocido responde `400 Bad Request` antes de llegar al repositorio.
+
+| Recurso | Filtros y búsqueda | `sortBy` permitido |
+|---|---|---|
+| `/scholarships` | `search`, `isActive` | `id`, `name`, `amount`, `startDate`, `endDate` |
+| `/students` | `search`, `career`, `semester`, `isActive` | `id`, `firstName`, `lastName`, `age`, `semester`, `career` |
+| `/applications` | `search`, `studentId`, `scholarshipId`, `status`, `activeOnly` | `id`, `gpa`, `income`, `status` |
+| `/documents` | `search`, `applicationId`, `status` | `id`, `name`, `status`, `applicationId` |
+| `/tracking` | `search`, `applicationId`, `status` | `id`, `status`, `createdAt`, `applicationId` |
+
+#### Solicitudes relacionadas (`QueryBuilder`)
+
+- `GET /applications` carga `student`, `scholarship`, `documents` y `trackings` con `leftJoinAndSelect`.
+- `search` coincide, sin distinguir mayúsculas (`ILIKE`), con nombre, apellido, nombre completo o correo del estudiante, nombre de la beca o comentario.
+- `activeOnly=true` limita a solicitudes de estudiantes activos.
+- El texto de búsqueda viaja como parámetro (`:search`), nunca interpolado en el SQL.
+- El orden usa una lista cerrada y `id` como desempate, para que las páginas sean estables.
+- Una búsqueda sin coincidencias responde `200` con `items: []`.
+
+#### Ejemplos de URL
+
+```http
+GET /scholarships?isActive=true&page=2&limit=5&sortBy=name&order=ASC
+GET /applications?search=ana&page=1&limit=5
+GET /applications?search=software&activeOnly=true&page=1&limit=2&sortBy=gpa&order=DESC
+GET /applications?studentId=1&status=pendiente
+GET /applications?search=inexistente
+GET /scholarships?limit=200
+```
+
+---
+
+## 9. Validaciones y manejo de errores
+
+El proyecto utiliza un `ValidationPipe` global configurado en `main.ts`:
 
 ```ts
-@Unique(['student', 'scholarship'])
+app.useGlobalPipes(
+  new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    forbidNonWhitelisted: true,
+  }),
+);
 ```
 
-Además, el servicio verifica previamente si ya existe una solicitud.
+Esta configuración permite:
 
-Si se intenta registrar nuevamente:
+- Validar los datos recibidos mediante DTOs.
+- Transformar parámetros cuando corresponde.
+- Rechazar propiedades que no están definidas en los DTOs.
+- Aplicar restricciones a los parámetros de consulta.
 
-```text
-409 Conflict
-```
+### Errores comprobados
 
-Mensaje:
+| Caso | Respuesta |
+|---|---|
+| Parámetro de página no numérico | `400 Bad Request` |
+| Límite superior al máximo permitido | `400 Bad Request` |
+| Identificador de filtro no válido | `400 Bad Request` |
+| Estado de documento no permitido | `400 Bad Request` |
+| Campo de ordenamiento desconocido | `400 Bad Request` |
+| Propiedad de consulta desconocida | `400 Bad Request` |
+| Consulta de un ID inexistente | `404 Not Found` |
+| Creación de documento con solicitud inexistente | `404 Not Found` |
+| Creación de seguimiento con solicitud inexistente | `404 Not Found` |
+| Beca sin nombre obligatorio | `400 Bad Request` |
+| Estudiante con edad negativa | `400 Bad Request` |
 
-```text
-El estudiante ya tiene una solicitud para esta beca
-```
+### Reglas de negocio de las solicitudes
+
+**Estudiante inexistente:** no se permite crear una solicitud con un estudiante que no existe.
+
+**Beca inexistente:** no se permite crear una solicitud con una beca que no existe.
+
+**Estudiante inactivo:** no se permite registrar una nueva solicitud con un estudiante inactivo.
+
+**Solicitud duplicada:** la combinación de estudiante y beca debe ser única. Cuando se intenta crear una solicitud duplicada, el servicio está diseñado para responder con `409 Conflict`.
+
+La respuesta específica de cada regla depende de las excepciones implementadas en el servicio correspondiente.
 
 ---
 
-# Tecnologías
+## 10. Configuración de PostgreSQL
 
-* Node.js
-* NestJS
-* TypeScript
-* class-validator
-* class-transformer
-* @nestjs/mapped-types
-* @nestjs/config
-* @nestjs/typeorm
-* TypeORM
-* PostgreSQL
-* pg
-* npm
-* Thunder Client
-
-Las tecnologías relacionadas con autenticación, como JWT y bcrypt, se incorporarán durante la implementación pendiente de la Etapa 2.
-
----
-
-# Arquitectura
-
-El proyecto utiliza una arquitectura modular proporcionada por NestJS.
-
-Cada recurso separa sus principales responsabilidades:
-
-```text
-Module
-├── Controller
-├── Service
-├── DTO
-├── Pipes
-└── Entity
-```
-
-### Controller
-
-Recibe las solicitudes HTTP y expone los endpoints de cada recurso.
-
-### Service
-
-Contiene la lógica de negocio y administra las operaciones sobre los recursos.
-
-También centraliza el manejo de recursos inexistentes mediante excepciones de NestJS.
-
-### DTO
-
-Define y valida los datos recibidos mediante `class-validator`.
-
-### Pipes
-
-Permiten validar parámetros de entrada, especialmente los identificadores.
-
-### Entity
-
-Representa la estructura de los datos almacenados en PostgreSQL mediante TypeORM y define las relaciones entre entidades.
-
----
-
-# Arquitectura de persistencia
-
-El flujo de persistencia utilizado por la aplicación es:
-
-```text
-Controller
-    ↓
-Service
-    ↓
-TypeORM Repository
-    ↓
-TypeORM
-    ↓
-PostgreSQL
-```
-
-Los servicios utilizan repositorios de TypeORM para realizar las operaciones de consulta, creación, actualización y eliminación.
-
----
-
-# Configuración de PostgreSQL
-
-El proyecto utiliza una instancia local de PostgreSQL para el desarrollo.
-
-## Base de datos
+La base de datos utilizada durante el desarrollo local es:
 
 ```text
 Nombre: SG_Becas_ULEAM
@@ -407,15 +613,23 @@ Puerto: 5432
 Usuario: postgres
 ```
 
-La contraseña se mantiene únicamente en el archivo `.env` local y no debe publicarse en el repositorio.
+La aplicación utiliza PostgreSQL como almacenamiento persistente y TypeORM como herramienta de mapeo objeto-relacional.
 
----
+Las tablas principales son:
 
-# Variables de entorno
+```text
+students
+scholarships
+applications
+documents
+tracking
+```
 
-La configuración se realiza mediante un archivo `.env`.
+Las relaciones entre las tablas se representan mediante claves foráneas.
 
-Ejemplo:
+### Variables de entorno
+
+El proyecto utiliza un archivo `.env` local para la conexión:
 
 ```env
 DATABASE_HOST=localhost
@@ -425,13 +639,7 @@ DATABASE_USER=postgres
 DATABASE_PASSWORD=tu_contraseña
 ```
 
-También se proporciona:
-
-```text
-.env.example
-```
-
-con valores de referencia:
+También se dispone de un archivo `.env.example` para indicar las variables requeridas sin publicar las credenciales reales:
 
 ```env
 DATABASE_HOST=localhost
@@ -441,34 +649,15 @@ DATABASE_USER=postgres
 DATABASE_PASSWORD=change_me
 ```
 
-El archivo `.env` se encuentra incluido en `.gitignore`.
+El archivo `.env` debe permanecer excluido del control de versiones mediante `.gitignore`.
 
-No se deben publicar contraseñas reales ni otras credenciales sensibles.
+**No se deben publicar contraseñas reales en GitHub.**
 
----
+### Configuración actual de TypeORM
 
-# Configuración de TypeORM
+La aplicación utiliza `@nestjs/config` y `@nestjs/typeorm` para configurar la conexión a PostgreSQL.
 
-La aplicación utiliza:
-
-```text
-@nestjs/config
-@nestjs/typeorm
-TypeORM
-pg
-```
-
-para establecer la conexión entre NestJS y PostgreSQL.
-
-La configuración de desarrollo utiliza:
-
-```ts
-ConfigModule.forRoot({
-  isGlobal: true,
-})
-```
-
-y:
+En el entorno de desarrollo se ha utilizado `synchronize: true` para mantener las tablas alineadas con las entidades durante la implementación.
 
 ```ts
 TypeOrmModule.forRootAsync({
@@ -487,655 +676,68 @@ TypeOrmModule.forRootAsync({
 })
 ```
 
-## Estado actual de `synchronize`
+Este fragmento describe la configuración de desarrollo actual; debe coincidir con el código real del repositorio.
 
-Durante el desarrollo actual se utiliza:
+### Pendiente para la entrega final
 
-```ts
-synchronize: true
-```
-
-Esto permite que TypeORM cree o actualice automáticamente las tablas a partir de las entidades.
-
-Esta configuración se mantiene únicamente como mecanismo de desarrollo local.
-
-### Pendiente para la entrega final de la Etapa 2
-
-La especificación de la Etapa 2 requiere utilizar migraciones y no depender de `synchronize`.
+La especificación de la etapa requiere migraciones de TypeORM y desactivar la sincronización automática.
 
 La transición prevista es:
 
 ```text
-synchronize: true
+Configuración de desarrollo
         ↓
-Crear migraciones
+Crear y verificar migraciones
         ↓
-Verificar migraciones
+Probar la aplicación con migraciones
         ↓
-synchronize: false
+Configurar synchronize: false
 ```
 
-Las migraciones todavía se encuentran pendientes de implementación.
+No se debe desactivar `synchronize` en el entorno de entrega hasta haber preparado y probado las migraciones correspondientes.
 
 ---
 
-# Entidades del sistema
+## 11. Pruebas realizadas hasta el momento
 
-## Students
+Las siguientes comprobaciones se han ejecutado durante el desarrollo.
 
-El módulo `students` permite gestionar los estudiantes que pueden solicitar una beca.
+| Prueba | Resultado |
+|---|---|
+| Compilación con `npm run build` | Correcta |
+| Consulta por ID en los cinco módulos | Correcta para los IDs probados |
+| Consulta de una solicitud con relaciones | Correcta para el registro probado |
+| Consulta de documento con su solicitud | Correcta para el registro probado |
+| Consulta de seguimiento por ID | Correcta para el registro probado |
+| Filtros combinados de becas | Correctos en la prueba realizada |
+| Filtros combinados de estudiantes | Correctos en la prueba realizada |
+| Filtros combinados de solicitudes | Correctos en la prueba realizada |
+| Filtros combinados de documentos | Correctos en la prueba realizada |
+| Filtros combinados de seguimiento | Correctos en la prueba realizada |
+| Ordenamiento descendente de documentos | Correcto después del ajuste |
+| Paginación de documentos | Correcta en las páginas probadas |
+| Validación de parámetros inválidos | Correcta en los casos probados |
+| Rechazo de propiedades desconocidas | Correcto en la prueba realizada |
+| Consulta de IDs inexistentes en los cinco módulos | HTTP 404 en los casos probados |
+| Beca sin nombre obligatorio | HTTP 400 |
+| Estudiante con edad negativa | HTTP 400 |
+| Documento con solicitud inexistente | HTTP 404 |
+| Seguimiento con solicitud inexistente | HTTP 404 |
 
-### Datos
+Estas pruebas confirman los casos indicados, pero no representan una garantía de que todos los escenarios posibles estén cubiertos.
 
-```text
-id
-firstName
-lastName
-nationalId
-email
-age
-career
-semester
-isActive
-```
+### Pruebas que faltan completar
 
-Tabla:
-
-```text
-students
-```
-
-El campo `email` se encuentra configurado como único en PostgreSQL.
-
----
-
-## Scholarships
-
-El módulo `scholarships` permite gestionar las becas disponibles.
-
-### Datos
-
-```text
-id
-name
-description
-amount
-startDate
-endDate
-isActive
-```
-
-Tabla:
-
-```text
-scholarships
-```
+- Crear, actualizar y eliminar registros de prueba en los cinco módulos.
+- Verificar todos los campos obligatorios y restricciones de los DTOs.
+- Probar de forma específica las reglas de eliminación y las claves foráneas.
+- Verificar la persistencia tras reiniciar el servidor y consultar nuevamente PostgreSQL.
+- Comprobar las migraciones cuando estén implementadas.
+- Probar registro, login y endpoints protegidos cuando se implemente JWT.
 
 ---
 
-## Applications
-
-El módulo `applications` permite registrar y administrar las solicitudes de beca realizadas por los estudiantes.
-
-### Datos
-
-```text
-id
-studentId
-scholarshipId
-gpa
-income
-comment
-status
-```
-
-Tabla:
-
-```text
-applications
-```
-
-### Estados
-
-```text
-pendiente
-revision
-aprobada
-rechazada
-correccion
-```
-
-### Relaciones
-
-```text
-Student 1:N Application
-
-Scholarship 1:N Application
-```
-
-### Reglas implementadas
-
-* El estudiante debe existir.
-* La beca debe existir.
-* El estudiante debe estar activo.
-* No se permite más de una solicitud del mismo estudiante para la misma beca.
-* Las solicitudes se almacenan de forma persistente en PostgreSQL.
-
----
-
-## Documents
-
-El módulo `documents` permite gestionar los documentos asociados a una solicitud de beca.
-
-### Datos
-
-```text
-id
-applicationId
-name
-url
-status
-```
-
-Tabla:
-
-```text
-documents
-```
-
-### Estados
-
-```text
-pendiente
-cargado
-observado
-aprobado
-```
-
-### Relación
-
-```text
-Application 1:N Document
-```
-
----
-
-## Tracking
-
-El módulo `tracking` permite registrar y administrar el historial de seguimiento de las solicitudes de beca.
-
-### Datos
-
-```text
-id
-applicationId
-status
-comment
-createdAt
-```
-
-Tabla:
-
-```text
-tracking
-```
-
-### Estados
-
-```text
-pendiente
-revision
-aprobada
-rechazada
-correccion
-```
-
-### Relación
-
-```text
-Application 1:N Tracking
-```
-
----
-
-# Estructura del proyecto
-
-```text
-src/
-│
-├── applications/
-│   ├── dto/
-│   │   ├── create-application.dto.ts
-│   │   └── update-application.dto.ts
-│   ├── entities/
-│   │   └── application.entity.ts
-│   ├── pipes/
-│   │   └── parse-application-id.pipe.ts
-│   ├── applications.controller.ts
-│   ├── applications.service.ts
-│   └── applications.module.ts
-│
-├── documents/
-│   ├── dto/
-│   │   ├── create-document.dto.ts
-│   │   └── update-document.dto.ts
-│   ├── entities/
-│   │   └── document.entity.ts
-│   ├── pipes/
-│   │   └── parse-document-id.pipe.ts
-│   ├── documents.controller.ts
-│   ├── documents.service.ts
-│   └── documents.module.ts
-│
-├── scholarships/
-│   ├── dto/
-│   │   ├── create-scholarship.dto.ts
-│   │   └── update-scholarship.dto.ts
-│   ├── entities/
-│   │   └── scholarship.entity.ts
-│   ├── pipes/
-│   │   └── parse-scholarship-id.pipe.ts
-│   ├── scholarships.controller.ts
-│   ├── scholarships.service.ts
-│   └── scholarships.module.ts
-│
-├── students/
-│   ├── dto/
-│   │   ├── create-student.dto.ts
-│   │   └── update-student.dto.ts
-│   ├── entities/
-│   │   └── students.entity.ts
-│   ├── pipes/
-│   │   └── parse-student-id.pipe.ts
-│   ├── students.controller.ts
-│   ├── students.service.ts
-│   └── students.module.ts
-│
-├── tracking/
-│   ├── dto/
-│   │   ├── create-tracking.dto.ts
-│   │   └── update-tracking.dto.ts
-│   ├── entities/
-│   │   └── tracking.entity.ts
-│   ├── pipes/
-│   │   └── parse-tracking-id.pipe.ts
-│   ├── tracking.controller.ts
-│   ├── tracking.service.ts
-│   └── tracking.module.ts
-│
-├── app.module.ts
-├── app.controller.ts
-├── app.service.ts
-└── main.ts
-```
-
----
-
-# Endpoints actuales
-
-## Students
-
-| Método | Endpoint        | Descripción                   |
-| ------ | --------------- | ----------------------------- |
-| GET    | `/students`     | Obtener todos los estudiantes |
-| GET    | `/students/:id` | Obtener un estudiante         |
-| POST   | `/students`     | Crear un estudiante           |
-| PATCH  | `/students/:id` | Actualizar un estudiante      |
-| DELETE | `/students/:id` | Eliminar un estudiante        |
-
-## Scholarships
-
-| Método | Endpoint            | Descripción             |
-| ------ | ------------------- | ----------------------- |
-| GET    | `/scholarships`     | Obtener todas las becas |
-| GET    | `/scholarships/:id` | Obtener una beca        |
-| POST   | `/scholarships`     | Crear una beca          |
-| PATCH  | `/scholarships/:id` | Actualizar una beca     |
-| DELETE | `/scholarships/:id` | Eliminar una beca       |
-
-## Applications
-
-| Método | Endpoint                                   | Descripción                              |
-| ------ | ------------------------------------------ | ---------------------------------------- |
-| GET    | `/applications`                            | Obtener solicitudes                      |
-| GET    | `/applications/:id`                        | Obtener una solicitud con sus relaciones |
-| GET    | `/applications/student/:studentId`         | Obtener solicitudes de un estudiante     |
-| GET    | `/applications/scholarship/:scholarshipId` | Obtener solicitudes de una beca          |
-| POST   | `/applications`                            | Crear una solicitud                      |
-| PATCH  | `/applications/:id`                        | Actualizar una solicitud                 |
-| PATCH  | `/applications/:id/status`                 | Cambiar estado                           |
-| DELETE | `/applications/:id`                        | Eliminar una solicitud                   |
-
-## Documents
-
-| Método | Endpoint                                | Descripción                         |
-| ------ | --------------------------------------- | ----------------------------------- |
-| GET    | `/documents`                            | Obtener documentos                  |
-| GET    | `/documents/:id`                        | Obtener un documento                |
-| GET    | `/documents/application/:applicationId` | Obtener documentos de una solicitud |
-| POST   | `/documents`                            | Crear un documento                  |
-| PATCH  | `/documents/:id`                        | Actualizar un documento             |
-| PATCH  | `/documents/:id/status`                 | Cambiar estado                      |
-| DELETE | `/documents/:id`                        | Eliminar un documento               |
-
-## Tracking
-
-| Método | Endpoint                               | Descripción                        |
-| ------ | -------------------------------------- | ---------------------------------- |
-| GET    | `/tracking`                            | Obtener seguimientos               |
-| GET    | `/tracking/:id`                        | Obtener un seguimiento             |
-| GET    | `/tracking/application/:applicationId` | Obtener historial de una solicitud |
-| POST   | `/tracking`                            | Crear un seguimiento               |
-| PATCH  | `/tracking/:id`                        | Actualizar un seguimiento          |
-| DELETE | `/tracking/:id`                        | Eliminar un seguimiento            |
-
----
-
-# Validación global
-
-El proyecto utiliza un `ValidationPipe` global:
-
-```ts
-app.useGlobalPipes(
-  new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    forbidNonWhitelisted: true,
-  }),
-);
-```
-
-Esta configuración permite:
-
-* Validar datos mediante DTOs.
-* Transformar valores cuando corresponde.
-* Permitir únicamente propiedades definidas en los DTOs.
-* Rechazar propiedades no definidas.
-
-Los errores de validación generan:
-
-```text
-400 Bad Request
-```
-
-Los recursos inexistentes generan:
-
-```text
-404 Not Found
-```
-
----
-
-# Manejo de errores
-
-Los servicios utilizan excepciones de NestJS para controlar diferentes situaciones.
-
-### ID inválido
-
-Ejemplo:
-
-```text
-GET /students/a
-```
-
-Respuesta:
-
-```text
-400 Bad Request
-```
-
-### Recurso inexistente
-
-Ejemplo:
-
-```text
-GET /applications/999
-```
-
-Respuesta:
-
-```text
-404 Not Found
-```
-
-### Solicitud duplicada
-
-Ejemplo:
-
-```text
-POST /applications
-```
-
-con el mismo estudiante y beca:
-
-```text
-409 Conflict
-```
-
-### Estudiante inactivo
-
-Al intentar registrar una solicitud con un estudiante inactivo:
-
-```text
-400 Bad Request
-```
-
----
-
-# Consultas implementadas
-
-Actualmente el módulo `applications` permite consultar información relacionada.
-
-### Solicitudes por estudiante
-
-```text
-GET /applications/student/:studentId
-```
-
-Ejemplo:
-
-```text
-GET /applications/student/3
-```
-
-### Solicitudes por beca
-
-```text
-GET /applications/scholarship/:scholarshipId
-```
-
-Ejemplo:
-
-```text
-GET /applications/scholarship/5
-```
-
-### Consulta completa de una solicitud
-
-```text
-GET /applications/:id
-```
-
-La respuesta puede incluir:
-
-```text
-Application
-├── Student
-├── Scholarship
-├── Documents
-└── Tracking
-```
-
----
-
-# Persistencia relacional
-
-La persistencia se realiza mediante PostgreSQL y TypeORM.
-
-Las principales tablas son:
-
-```text
-students
-scholarships
-applications
-documents
-tracking
-```
-
-Las relaciones se almacenan mediante claves foráneas.
-
-El flujo es:
-
-```text
-Student
-   ↓
-Application
-   ├── Scholarship
-   ├── Documents
-   └── Tracking
-```
-
-La persistencia fue comprobada mediante Thunder Client y PostgreSQL.
-
-También se verificó que los datos permanecen disponibles después de detener y volver a iniciar la aplicación.
-
-Por ejemplo, después de reiniciar el servidor se recuperó correctamente la solicitud `Application` con ID `3`, incluyendo:
-
-* Student `3`.
-* Scholarship `5`.
-* Document `3`.
-* Tracking `3`.
-
-Esto demuestra que la información relacionada permanece almacenada en PostgreSQL.
-
----
-
-# Evidencias
-
-Las evidencias de la Etapa 1 se encuentran organizadas en:
-
-```text
-Evidencias Entrega 1/
-```
-
-Las evidencias existentes incluyen:
-
-```text
-01-Students/
-02-Scholarships/
-03-Applications/
-04-Documents/
-05-Tracking/
-06-Validaciones/
-07-Persistencia-PostgreSQL/
-```
-
-Para las pruebas de la Etapa 2 se recomienda incorporar:
-
-```text
-Evidencias Entrega 2/
-├── 01-Relaciones/
-├── 02-Consultas/
-├── 03-Persistencia-Relacional/
-├── 04-Migraciones/
-├── 05-Registro/
-├── 06-Login-JWT/
-└── 07-Rutas-Protegidas/
-```
-
-Las carpetas correspondientes a funcionalidades todavía no implementadas deberán completarse conforme avance la etapa.
-
----
-
-# Estado actual del proyecto
-
-## Etapa 1 — Implementado
-
-* [x] Configuración inicial de NestJS.
-* [x] Arquitectura modular.
-* [x] Módulo `students`.
-* [x] CRUD de `students`.
-* [x] DTOs de `students`.
-* [x] Validaciones de `students`.
-* [x] Pipe para IDs de `students`.
-* [x] Módulo `scholarships`.
-* [x] CRUD de `scholarships`.
-* [x] DTOs de `scholarships`.
-* [x] Validaciones de `scholarships`.
-* [x] Pipe para IDs de `scholarships`.
-* [x] Módulo `applications`.
-* [x] CRUD de `applications`.
-* [x] DTOs de `applications`.
-* [x] Validaciones de `applications`.
-* [x] Pipe para IDs de `applications`.
-* [x] Módulo `documents`.
-* [x] CRUD de `documents`.
-* [x] DTOs de `documents`.
-* [x] Validaciones de `documents`.
-* [x] Pipe para IDs de `documents`.
-* [x] Módulo `tracking`.
-* [x] CRUD de `tracking`.
-* [x] DTOs de `tracking`.
-* [x] Validaciones de `tracking`.
-* [x] Pipe para IDs de `tracking`.
-* [x] PostgreSQL.
-* [x] TypeORM.
-* [x] Variables de entorno.
-* [x] Entidades TypeORM.
-* [x] Repositorios TypeORM.
-* [x] Persistencia de los registros.
-* [x] `ValidationPipe` global.
-* [x] Manejo de errores `400` y `404`.
-* [x] Pruebas mediante Thunder Client.
-* [x] Evidencias de CRUD.
-* [x] Evidencias de validaciones.
-* [x] Evidencias de persistencia.
-
-## Etapa 2 — Implementado hasta el momento
-
-* [x] Continuidad de la API de la Etapa 1.
-* [x] Relaciones `@ManyToOne`.
-* [x] Relaciones `@OneToMany`.
-* [x] Claves foráneas.
-* [x] Integridad referencial.
-* [x] Reglas de eliminación mediante `onDelete`.
-* [x] Consulta de información relacionada.
-* [x] Persistencia relacional en PostgreSQL.
-* [x] Validación de estudiante existente.
-* [x] Validación de beca existente.
-* [x] Validación de estudiante activo.
-* [x] Prevención de solicitudes duplicadas.
-* [x] Respuesta `409 Conflict` para solicitudes duplicadas.
-* [x] Consultas de solicitudes por estudiante.
-* [x] Consultas de solicitudes por beca.
-* [x] Cambio de estado de una solicitud.
-* [x] Verificación de persistencia después de reiniciar la aplicación.
-
-## Etapa 2 — Pendiente
-
-* [ ] Búsqueda avanzada mediante query params.
-* [ ] Filtros mediante query params.
-* [ ] Paginación.
-* [ ] Ordenamiento.
-* [ ] Metadatos de paginación.
-* [ ] Validación de parámetros de consulta.
-* [ ] Migraciones de TypeORM.
-* [ ] Configuración final con `synchronize: false`.
-* [ ] Módulo `users`.
-* [ ] Registro de usuarios.
-* [ ] Hash de contraseñas.
-* [ ] Módulo `auth`.
-* [ ] Login.
-* [ ] Generación de JWT.
-* [ ] JWT Guard.
-* [ ] Protección de al menos dos endpoints de escritura.
-* [ ] Evidencias de autenticación.
-* [ ] Evidencias de rutas protegidas.
-* [ ] Documento final de la Etapa 2.
-
----
-
-# Instalación
+## 12. Instalación
 
 Clonar el repositorio:
 
@@ -1143,145 +745,170 @@ Clonar el repositorio:
 git clone https://github.com/GabrielGL11/proyecto_asw.git
 ```
 
-Ingresar al proyecto:
+Ingresar a la carpeta:
 
 ```bash
 cd proyecto_asw
 ```
 
-Instalar dependencias:
+Instalar las dependencias:
 
 ```bash
 npm install
 ```
 
-Crear el archivo:
+Crear un archivo `.env` a partir de `.env.example` y configurar los datos de conexión a PostgreSQL.
 
-```text
-.env
-```
-
-Configurar las variables correspondientes de PostgreSQL.
+Antes de iniciar la aplicación, verificar que PostgreSQL esté funcionando y que exista la base de datos configurada.
 
 ---
 
-# Ejecución
+## 13. Ejecución de la aplicación
 
-## Desarrollo
+### Desarrollo
 
 ```bash
 npm run start
 ```
 
-## Modo watch
+### Desarrollo con recarga automática
 
 ```bash
 npm run start:dev
 ```
 
-## Producción
+### Producción
 
 ```bash
 npm run start:prod
 ```
 
-Actualmente la aplicación utiliza:
+La API se utiliza actualmente en:
 
 ```text
 http://localhost:5500
 ```
 
+El puerto depende de la configuración de la aplicación.
+
 ---
 
-# Pruebas
+## 14. Comandos de comprobación
 
-## Pruebas unitarias
+### Compilar el proyecto
+
+```bash
+npm run build
+```
+
+### Ejecutar pruebas unitarias
 
 ```bash
 npm run test
 ```
 
-## Pruebas end-to-end
+### Ejecutar pruebas end-to-end
 
 ```bash
 npm run test:e2e
 ```
 
-## Cobertura
+### Obtener cobertura de pruebas
 
 ```bash
 npm run test:cov
 ```
 
-Las pruebas manuales de los endpoints se realizan mediante **Thunder Client**.
+Las pruebas manuales de los endpoints se realizan mediante Thunder Client y, cuando corresponde, mediante PowerShell.
 
 ---
 
-# Base de datos
+## 15. Evidencias del proyecto
 
-La base de datos utilizada durante el desarrollo es:
+Las capturas deben organizarse según las pruebas que realmente se hayan realizado.
+
+Una estructura propuesta para la siguiente entrega es:
 
 ```text
-SG_Becas_ULEAM
+Evidencias Entrega 2/
+├── 01-Modelo-Relacional/
+├── 02-Consultas-Filtros/
+├── 03-Paginacion-Ordenamiento/
+├── 04-Validaciones-Errores/
+├── 05-Persistencia-PostgreSQL/
+├── 06-Migraciones/
+├── 07-Registro-Usuarios/
+├── 08-Login-JWT/
+└── 09-Rutas-Protegidas/
 ```
 
-Tablas principales:
+Las carpetas de migraciones y autenticación deberán completarse cuando esas funcionalidades estén implementadas y probadas.
 
-```text
-students
-scholarships
-applications
-documents
-tracking
-```
-
-Las tablas se encuentran relacionadas mediante claves foráneas definidas por TypeORM.
+Las evidencias anteriores deben conservarse si forman parte de la entrega de la primera etapa.
 
 ---
 
-# Próximos pasos
+## 16. Lista de trabajo pendiente
 
-Para completar la Etapa 2 se deberán implementar:
+### Consultas y validaciones
 
-1. Filtros mediante query params.
-2. Paginación.
-3. Ordenamiento.
-4. Metadatos de paginación.
-5. Migraciones de TypeORM.
-6. Desactivación de `synchronize`.
-7. Módulo de usuarios.
-8. Registro seguro de usuarios.
-9. Hash de contraseñas.
-10. Login.
-11. Emisión de JWT.
-12. Guard de autenticación.
-13. Protección de al menos dos operaciones de escritura.
-14. Evidencias correspondientes.
-15. Actualización final del documento de entrega.
+- [x] DTOs de consulta en los cinco módulos.
+- [x] Búsqueda y filtros implementados según cada recurso.
+- [x] Paginación.
+- [x] Ordenamiento.
+- [x] Metadatos de paginación.
+- [x] Validación de parámetros de consulta.
+- [x] Pruebas de varias combinaciones de filtros.
+- [x] Pruebas de errores HTTP `400` y `404` en los casos documentados.
+- [ ] Completar las pruebas de CRUD para los cinco módulos.
+- [ ] Completar las pruebas de integridad referencial y eliminación.
+
+### Persistencia y configuración
+
+- [x] Entidades de TypeORM.
+- [x] Conexión con PostgreSQL.
+- [x] Relaciones entre los recursos.
+- [ ] Crear y probar migraciones.
+- [ ] Desactivar `synchronize` para la configuración final de entrega.
+- [ ] Verificar toda la configuración final del entorno.
+
+### Autenticación y seguridad
+
+- [ ] Crear el módulo `users`.
+- [ ] Implementar el registro de usuarios.
+- [ ] Implementar el hash de contraseñas.
+- [ ] Crear el módulo `auth`.
+- [ ] Implementar el login.
+- [ ] Generar tokens JWT.
+- [ ] Implementar la validación de tokens.
+- [ ] Configurar el guard de autenticación.
+- [ ] Proteger al menos dos endpoints de escritura.
+- [ ] Probar las respuestas de acceso autorizado y no autorizado.
+
+### Documentación y entrega
+
+- [ ] Completar las evidencias de las pruebas restantes.
+- [ ] Preparar el documento final de la etapa.
+- [ ] Verificar que `.env` no se publique en el repositorio.
+- [ ] Ejecutar nuevamente `npm run build`.
+- [ ] Revisar el estado final del repositorio y sus commits.
 
 ---
 
-# Repositorio
+## 17. Recursos oficiales
 
-Repositorio del proyecto:
-
-```text
-https://github.com/GabrielGL11/proyecto_asw
-```
-
----
-
-# Recursos
-
-* NestJS Documentation: https://docs.nestjs.com/
-* NestJS GitHub: https://github.com/nestjs/nest
-* NestJS Courses: https://courses.nestjs.com/
-* NestJS Devtools: https://devtools.nestjs.com/
+- [Documentación de NestJS](https://docs.nestjs.com/)
+- [Repositorio de NestJS](https://github.com/nestjs/nest)
+- [Documentación de TypeORM](https://typeorm.io/)
+- [Documentación de PostgreSQL](https://www.postgresql.org/docs/)
+- [Documentación de class-validator](https://github.com/typestack/class-validator)
 
 ---
 
-# Autoría
+## Autoría
 
-Proyecto académico desarrollado para la asignatura de **Desarrollo Backend Web**.
+Proyecto académico desarrollado para la asignatura de **Desarrollo Backend Web con NestJS**.
 
-**ULEAM — Universidad Laica Eloy Alfaro de Manabí**
+**Universidad Laica Eloy Alfaro de Manabí (ULEAM)**
+
+Repositorio: [https://github.com/GabrielGL11/proyecto_asw](https://github.com/GabrielGL11/proyecto_asw)
