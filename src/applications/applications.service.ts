@@ -61,6 +61,7 @@ import { ApplicationsQueryDto } from './dto/applications-query.dto.js';
         studentId,
         scholarshipId,
         status,
+         activeOnly,
         page = 1,
         limit = 10,
         sortBy = 'id',
@@ -86,6 +87,7 @@ import { ApplicationsQueryDto } from './dto/applications-query.dto.js';
           `(
             student.firstName ILIKE :search
             OR student.lastName ILIKE :search
+            OR CONCAT(student.firstName, ' ', student.lastName) ILIKE :search
             OR student.email ILIKE :search
             OR scholarship.name ILIKE :search
             OR application.comment ILIKE :search
@@ -103,6 +105,9 @@ import { ApplicationsQueryDto } from './dto/applications-query.dto.js';
       }
       if (status) {
         qb.andWhere('application.status = :status', { status });
+      }
+      if (activeOnly === true) {
+        qb.andWhere('student.isActive = :active', { active: true });
       }
       qb.orderBy(`application.${safeSortBy}`, order);
       qb.addOrderBy('application.id', 'ASC');

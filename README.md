@@ -508,6 +508,47 @@ GET /documents?page=2&limit=1
 
 Estas consultas permiten verificar que los registros se distribuyen entre páginas y que los metadatos se actualizan según el resultado.
 
+### Semana 6 — Consultas de datos
+
+Contrato común de los listados (`/students`, `/scholarships`, `/applications`, `/documents`, `/tracking`):
+
+| Parámetro | Regla | Valor por defecto |
+|---|---|---|
+| `page` | Entero ≥ 1 | `1` |
+| `limit` | Entero de 1 a 50 | `10` |
+| `sortBy` | Solo campos de la lista permitida de cada recurso | `id` |
+| `order` | `ASC` o `DESC` | `ASC` |
+
+Un valor inválido o un parámetro desconocido responde `400 Bad Request` antes de llegar al repositorio.
+
+| Recurso | Filtros y búsqueda | `sortBy` permitido |
+|---|---|---|
+| `/scholarships` | `search`, `isActive` | `id`, `name`, `amount`, `startDate`, `endDate` |
+| `/students` | `search`, `career`, `semester`, `isActive` | `id`, `firstName`, `lastName`, `age`, `semester`, `career` |
+| `/applications` | `search`, `studentId`, `scholarshipId`, `status`, `activeOnly` | `id`, `gpa`, `income`, `status` |
+| `/documents` | `search`, `applicationId`, `status` | `id`, `name`, `status`, `applicationId` |
+| `/tracking` | `search`, `applicationId`, `status` | `id`, `status`, `createdAt`, `applicationId` |
+
+#### Solicitudes relacionadas (`QueryBuilder`)
+
+- `GET /applications` carga `student`, `scholarship`, `documents` y `trackings` con `leftJoinAndSelect`.
+- `search` coincide, sin distinguir mayúsculas (`ILIKE`), con nombre, apellido, nombre completo o correo del estudiante, nombre de la beca o comentario.
+- `activeOnly=true` limita a solicitudes de estudiantes activos.
+- El texto de búsqueda viaja como parámetro (`:search`), nunca interpolado en el SQL.
+- El orden usa una lista cerrada y `id` como desempate, para que las páginas sean estables.
+- Una búsqueda sin coincidencias responde `200` con `items: []`.
+
+#### Ejemplos de URL
+
+```http
+GET /scholarships?isActive=true&page=2&limit=5&sortBy=name&order=ASC
+GET /applications?search=ana&page=1&limit=5
+GET /applications?search=software&activeOnly=true&page=1&limit=2&sortBy=gpa&order=DESC
+GET /applications?studentId=1&status=pendiente
+GET /applications?search=inexistente
+GET /scholarships?limit=200
+```
+
 ---
 
 ## 9. Validaciones y manejo de errores

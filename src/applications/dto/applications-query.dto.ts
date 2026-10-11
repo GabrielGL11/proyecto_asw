@@ -1,6 +1,5 @@
-
 import { Transform, Type } from 'class-transformer';
-import { IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { IsBoolean, IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
 export class ApplicationsQueryDto {
     @IsOptional()
@@ -19,6 +18,15 @@ export class ApplicationsQueryDto {
     @IsInt()
     @Min(1)
     scholarshipId?: number;
+
+    @IsOptional()
+    @Transform(({ value }) => {
+        if (value === 'true') return true;
+        if (value === 'false') return false;
+        return value;
+    })
+    @IsBoolean()
+    activeOnly?: boolean;
 
     @IsOptional()
     @IsIn([
