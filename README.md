@@ -2,86 +2,102 @@
 
 Backend desarrollado con **NestJS, TypeScript, TypeORM y PostgreSQL** para administrar los procesos de becas estudiantiles de la Universidad Laica Eloy Alfaro de Manabí (ULEAM).
 
-El proyecto se desarrolla para la asignatura **Desarrollo Backend Web con NestJS**, dando continuidad a la etapa inicial e incorporando persistencia relacional, consultas avanzadas, migraciones y autenticación mediante JWT.
+Proyecto académico de la asignatura **Desarrollo Backend Web con NestJS — Segunda Etapa**.
 
-**Repositorio:** [GabrielGL11/proyecto_asw](https://github.com/GabrielGL11/proyecto_asw)
+**Repositorio:** [https://github.com/GabrielGL11/proyecto_asw](https://github.com/GabrielGL11/proyecto_asw)
 
 ---
 
 ## 1. Descripción del proyecto
 
-El Sistema de Gestión de Becas ULEAM permite administrar los siguientes recursos:
+El Sistema de Gestión de Becas ULEAM es una API REST que permite administrar la información relacionada con las becas universitarias y sus procesos asociados.
 
-- Estudiantes.
-- Becas.
-- Solicitudes de becas.
-- Documentos.
-- Seguimiento de solicitudes.
-- Usuarios y autenticación.
+Los principales recursos del sistema son:
 
-La aplicación utiliza una arquitectura modular de NestJS. PostgreSQL almacena los datos y TypeORM gestiona las entidades, relaciones y operaciones de persistencia.
+- **Estudiantes (Students):** información de los estudiantes.
+- **Becas (Scholarships):** becas disponibles y sus características.
+- **Solicitudes (Applications):** solicitudes presentadas por los estudiantes.
+- **Documentos (Documents):** documentos asociados a las solicitudes.
+- **Seguimiento (Tracking):** historial y seguimiento de los procesos.
+- **Usuarios (Users):** cuentas utilizadas para la autenticación.
 
-Entre sus funcionalidades se encuentran las operaciones CRUD, validaciones, manejo de errores HTTP, relaciones entre entidades, búsqueda, filtros, paginación, ordenamiento y autenticación JWT.
+La aplicación utiliza una arquitectura modular de NestJS. PostgreSQL proporciona la persistencia de los datos y TypeORM administra las entidades, las relaciones y las consultas a la base de datos.
 
-## 2. Etapas del proyecto
+El proyecto incorpora operaciones CRUD, validación de datos, manejo de errores HTTP, integridad referencial, filtros, búsquedas, paginación, ordenamiento, migraciones versionadas y autenticación mediante JWT.
+
+## 2. Objetivos del sistema
+
+- Administrar los recursos relacionados con los procesos de becas.
+- Mantener relaciones entre estudiantes, becas, solicitudes, documentos y seguimientos.
+- Garantizar la integridad de la información mediante claves foráneas y restricciones.
+- Facilitar consultas mediante filtros, búsquedas, ordenamiento y paginación.
+- Proteger las operaciones de escritura mediante autenticación JWT.
+- Gestionar los cambios de estructura de la base de datos mediante migraciones.
+- Validar los datos recibidos y responder con códigos HTTP apropiados.
+
+## 3. Etapas del proyecto
 
 ### Etapa 1 — Fundamentos y definición de la API
 
-Se implementó la estructura inicial del backend:
+Se desarrolló la estructura inicial del backend, incluyendo:
 
 - Arquitectura modular con NestJS.
-- Módulos de estudiantes, becas, solicitudes, documentos y seguimiento.
+- Módulos para estudiantes, becas, solicitudes, documentos y seguimiento.
 - Entidades y DTOs.
+- Operaciones CRUD.
 - Validaciones mediante `class-validator`.
 - `ValidationPipe` global.
-- Validación de identificadores.
-- Operaciones CRUD.
-- Integración con PostgreSQL.
-- Configuración mediante variables de entorno.
+- Pipes para validar identificadores.
 - Manejo de errores HTTP.
+- Integración con PostgreSQL y TypeORM.
+- Configuración mediante variables de entorno.
+- Pruebas manuales con Thunder Client.
 
 ### Etapa 2 — Modelo relacional, consultas y autenticación
 
-Se incorporaron las siguientes funcionalidades:
+Se incorporaron las funcionalidades de la segunda etapa:
 
 - Relaciones `@ManyToOne` y `@OneToMany`.
 - Claves foráneas y restricciones de integridad.
+- Reglas de eliminación y prevención de solicitudes duplicadas.
 - Validación de estudiantes y becas al crear solicitudes.
 - Validación de estudiantes activos.
-- Prevención de solicitudes duplicadas.
-- Búsqueda, filtros, paginación y ordenamiento.
-- Metadatos de paginación.
+- Consultas de información relacionada.
+- Filtros, búsquedas y parámetros de consulta.
+- Paginación y metadatos de resultados.
+- Ordenamiento mediante `sortBy` y `order`.
 - Validación de parámetros de consulta.
-- Configuración de TypeORM con `synchronize: false` para la entrega.
-- Fuente de datos y estructura de migraciones.
-- Registro de usuarios.
-- Hash de contraseñas mediante bcrypt.
+- Migraciones versionadas de TypeORM.
+- Configuración de persistencia con `synchronize: false`.
+- Registro de usuarios y hash de contraseñas mediante bcrypt.
 - Inicio de sesión y generación de JWT.
-- Estrategia y guard JWT.
-- Protección de rutas de escritura de solicitudes y documentos.
+- Estrategia y guard de autenticación.
+- Protección de operaciones de escritura.
 
-## 3. Tecnologías utilizadas
+## 4. Tecnologías utilizadas
 
-- Node.js y npm.
-- NestJS y TypeScript.
-- PostgreSQL.
-- TypeORM y `pg`.
-- `@nestjs/config`.
-- `@nestjs/typeorm`.
-- `class-validator` y `class-transformer`.
-- `@nestjs/mapped-types`.
-- Joi.
-- `@nestjs/jwt`.
-- `@nestjs/passport`.
-- Passport y `passport-jwt`.
-- bcrypt.
-- `typeorm-ts-node-esm`.
-- Vitest.
-- Thunder Client para pruebas manuales.
+| Tecnología | Uso |
+|---|---|
+| Node.js y npm | Entorno de ejecución y administración de dependencias |
+| NestJS | Framework para el desarrollo del backend |
+| TypeScript | Lenguaje de programación |
+| PostgreSQL | Base de datos relacional |
+| TypeORM | Mapeo objeto-relacional, repositorios y migraciones |
+| `pg` | Conexión con PostgreSQL |
+| `@nestjs/config` | Configuración mediante variables de entorno |
+| `class-validator` | Validación de datos |
+| `class-transformer` | Transformación de datos |
+| Joi | Validación de configuración, cuando corresponda |
+| `@nestjs/jwt` | Generación y manejo de JWT |
+| `@nestjs/passport` | Integración de Passport con NestJS |
+| `passport-jwt` | Estrategia JWT |
+| bcrypt | Hash de contraseñas |
+| Vitest | Pruebas automatizadas |
+| Thunder Client | Pruebas manuales de la API |
 
-## 4. Arquitectura del sistema
+## 5. Arquitectura del sistema
 
-El proyecto separa responsabilidades mediante controladores, servicios, DTOs, entidades, repositorios, pipes y guards.
+El proyecto utiliza una arquitectura modular que separa las responsabilidades de los controladores, servicios, DTOs, entidades y módulos.
 
 ### Estructura general
 
@@ -97,8 +113,22 @@ src/
 ├── migrations/
 ├── data-source.ts
 ├── app.module.ts
+├── app.controller.ts
+├── app.service.ts
 └── main.ts
 ```
+
+Cada módulo contiene los componentes necesarios para gestionar su recurso, según su implementación.
+
+### Responsabilidades
+
+- **Controller:** recibe solicitudes HTTP y define los endpoints.
+- **Service:** implementa la lógica de negocio y las operaciones sobre los recursos.
+- **DTO:** define y valida los datos de entrada.
+- **Entity:** representa la estructura de los datos y sus relaciones.
+- **Repository:** permite consultar y modificar los registros mediante TypeORM.
+- **Guard:** controla el acceso a las rutas protegidas.
+- **Migration:** registra cambios versionados en el esquema de la base de datos.
 
 ### Flujo de persistencia
 
@@ -133,12 +163,12 @@ Authorization: Bearer <token>
     ↓
 JwtAuthGuard y JwtStrategy
     ↓
-Acceso al endpoint protegido
+Acceso autorizado al endpoint protegido
 ```
 
-## 5. Modelo relacional
+## 6. Modelo relacional
 
-Las relaciones principales del sistema son:
+Las entidades principales mantienen las siguientes relaciones:
 
 ```text
 Student 1:N Application N:1 Scholarship
@@ -148,23 +178,45 @@ Application 1:N Document
 Application 1:N Tracking
 ```
 
-- **Student — Application:** un estudiante puede registrar varias solicitudes.
-- **Scholarship — Application:** una beca puede tener varias solicitudes.
-- **Application — Document:** una solicitud puede contener varios documentos.
-- **Application — Tracking:** una solicitud puede tener varios registros de seguimiento.
+### Relaciones entre entidades
 
-La entidad `Application` mantiene las claves foráneas `studentId` y `scholarshipId`. Las entidades `Document` y `Tracking` mantienen la clave foránea `applicationId`.
+**Student — Application**
 
-### Reglas de eliminación
+Un estudiante puede registrar varias solicitudes de becas, pero cada solicitud pertenece a un estudiante.
 
-- Las relaciones entre solicitudes, estudiantes y becas utilizan `ON DELETE RESTRICT`.
-- Las relaciones de documentos y seguimientos con solicitudes están configuradas según las reglas de eliminación definidas en sus entidades y migraciones.
+**Scholarship — Application**
 
-Las claves foráneas de `applications.studentId` y `applications.scholarshipId` se comprobaron en PostgreSQL con la regla `ON DELETE RESTRICT`.
+Una beca puede recibir varias solicitudes, pero cada solicitud corresponde a una beca.
 
-## 6. Entidades principales
+**Application — Document**
 
-### 6.1. Students
+Una solicitud puede contener varios documentos, y cada documento pertenece a una solicitud.
+
+**Application — Tracking**
+
+Una solicitud puede tener varios registros de seguimiento.
+
+### Claves foráneas y reglas de eliminación
+
+La entidad `Application` mantiene las claves foráneas `studentId` y `scholarshipId`.
+
+Las relaciones entre solicitudes, estudiantes y becas utilizan la regla `ON DELETE RESTRICT`, que impide eliminar estudiantes o becas cuando existen solicitudes relacionadas.
+
+Las relaciones de documentos y seguimientos con sus solicitudes utilizan las reglas de eliminación configuradas en las entidades y migraciones correspondientes.
+
+### Prevención de solicitudes duplicadas
+
+El sistema evita que un mismo estudiante registre más de una solicitud para la misma beca mediante una restricción única compuesta y una validación en el servicio.
+
+Cuando se intenta registrar una solicitud duplicada, la API devuelve:
+
+```text
+409 Conflict
+```
+
+## 7. Entidades principales
+
+### 7.1. Students
 
 Tabla: `students`.
 
@@ -182,9 +234,9 @@ semester
 isActive
 ```
 
-El correo electrónico está configurado como único.
+El correo electrónico se encuentra configurado como único.
 
-### 6.2. Scholarships
+### 7.2. Scholarships
 
 Tabla: `scholarships`.
 
@@ -200,7 +252,9 @@ endDate
 isActive
 ```
 
-### 6.3. Applications
+Permite administrar las becas disponibles y consultar sus características.
+
+### 7.3. Applications
 
 Tabla: `applications`.
 
@@ -216,7 +270,7 @@ comment
 status
 ```
 
-Estados permitidos:
+Estados de las solicitudes:
 
 ```text
 pendiente
@@ -228,14 +282,13 @@ correccion
 
 Reglas de negocio:
 
-- El estudiante debe existir y estar activo.
+- El estudiante debe existir.
 - La beca debe existir.
-- No se permite más de una solicitud del mismo estudiante para la misma beca.
-- Se comprueba la existencia de los registros relacionados antes de crear una solicitud.
+- El estudiante debe estar activo para presentar una nueva solicitud.
+- No se permite una solicitud duplicada del mismo estudiante para la misma beca.
+- Se validan las relaciones antes de crear la solicitud.
 
-La combinación de estudiante y beca cuenta con una restricción única compuesta y una comprobación adicional en el servicio.
-
-### 6.4. Documents
+### 7.4. Documents
 
 Tabla: `documents`.
 
@@ -249,7 +302,7 @@ url
 status
 ```
 
-Estados utilizados:
+Estados de los documentos:
 
 ```text
 pendiente
@@ -258,7 +311,9 @@ observado
 aprobado
 ```
 
-### 6.5. Tracking
+Los documentos están asociados a una solicitud mediante `applicationId`.
+
+### 7.5. Tracking
 
 Tabla: `tracking`.
 
@@ -272,9 +327,9 @@ comment
 createdAt
 ```
 
-Permite consultar el historial de seguimiento asociado a cada solicitud.
+Permite registrar y consultar el seguimiento de las solicitudes.
 
-### 6.6. Users
+### 7.6. Users
 
 Tabla: `users`.
 
@@ -289,105 +344,129 @@ password
 Características:
 
 - Correo electrónico único.
-- Contraseñas almacenadas mediante hash de bcrypt.
-- Contraseña excluida de las respuestas públicas.
+- Contraseñas almacenadas mediante hashes generados con bcrypt.
 - Registro de usuarios.
-- Inicio de sesión con generación de JWT.
+- Inicio de sesión con validación de credenciales.
+- Generación de tokens JWT para la autenticación.
 
-La migración de creación de usuarios se ejecutó correctamente en la base de datos de desarrollo.
+La entidad configura la contraseña para que no se seleccione en las consultas habituales de TypeORM, salvo cuando el servicio necesita recuperarla expresamente para verificar las credenciales.
 
-## 7. Endpoints de la API
+## 8. Endpoints de la API
 
-### Students
+La API utiliza métodos HTTP para consultar, crear, actualizar y eliminar recursos.
 
-| Método | Endpoint | Descripción |
-|---|---|---|
-| GET | `/students` | Consultar estudiantes |
-| GET | `/students/:id` | Consultar un estudiante |
-| POST | `/students` | Crear estudiante |
-| PATCH | `/students/:id` | Actualizar estudiante |
-| DELETE | `/students/:id` | Eliminar estudiante |
+### 8.1. Students
 
-### Scholarships
+| Método | Endpoint | Descripción | Acceso |
+|---|---|---|---|
+| GET | `/students` | Consultar estudiantes | Público |
+| GET | `/students/:id` | Consultar un estudiante | Público |
+| POST | `/students` | Crear estudiante | JWT |
+| PATCH | `/students/:id` | Actualizar estudiante | JWT |
+| DELETE | `/students/:id` | Eliminar estudiante | JWT |
 
-| Método | Endpoint | Descripción |
-|---|---|---|
-| GET | `/scholarships` | Consultar becas con filtros |
-| GET | `/scholarships/:id` | Consultar una beca |
-| POST | `/scholarships` | Crear beca |
-| PATCH | `/scholarships/:id` | Actualizar beca |
-| DELETE | `/scholarships/:id` | Eliminar beca |
+### 8.2. Scholarships
 
-### Applications
+| Método | Endpoint | Descripción | Acceso |
+|---|---|---|---|
+| GET | `/scholarships` | Consultar becas | Público |
+| GET | `/scholarships/:id` | Consultar una beca | Público |
+| POST | `/scholarships` | Crear beca | JWT |
+| PATCH | `/scholarships/:id` | Actualizar beca | JWT |
+| DELETE | `/scholarships/:id` | Eliminar beca | JWT |
 
-| Método | Endpoint | Descripción |
-|---|---|---|
-| GET | `/applications` | Consultar solicitudes con filtros |
-| GET | `/applications/:id` | Consultar solicitud y relaciones |
-| GET | `/applications/student/:studentId` | Consultar solicitudes de un estudiante |
-| GET | `/applications/scholarship/:scholarshipId` | Consultar solicitudes de una beca |
-| POST | `/applications` | Crear solicitud; requiere JWT |
-| PATCH | `/applications/:id` | Actualizar solicitud; requiere JWT |
-| PATCH | `/applications/:id/status` | Cambiar estado; requiere JWT |
-| DELETE | `/applications/:id` | Eliminar solicitud; requiere JWT |
+### 8.3. Applications
 
-### Documents
+| Método | Endpoint | Descripción | Acceso |
+|---|---|---|---|
+| GET | `/applications` | Consultar solicitudes | Público |
+| GET | `/applications/:id` | Consultar una solicitud | Público |
+| GET | `/applications/student/:studentId` | Consultar solicitudes de un estudiante | Público |
+| GET | `/applications/scholarship/:scholarshipId` | Consultar solicitudes de una beca | Público |
+| POST | `/applications` | Crear solicitud | JWT |
+| PATCH | `/applications/:id` | Actualizar solicitud | JWT |
+| PATCH | `/applications/:id/status` | Cambiar estado | JWT |
+| DELETE | `/applications/:id` | Eliminar solicitud | JWT |
 
-| Método | Endpoint | Descripción |
-|---|---|---|
-| GET | `/documents` | Consultar documentos |
-| GET | `/documents/:id` | Consultar documento |
-| GET | `/documents/application/:applicationId` | Consultar documentos de una solicitud |
-| POST | `/documents` | Crear documento; requiere JWT |
-| PATCH | `/documents/:id` | Actualizar documento; requiere JWT |
-| PATCH | `/documents/:id/status` | Cambiar estado; requiere JWT |
-| DELETE | `/documents/:id` | Eliminar documento; requiere JWT |
+### 8.4. Documents
 
-### Tracking
+| Método | Endpoint | Descripción | Acceso |
+|---|---|---|---|
+| GET | `/documents` | Consultar documentos | Público |
+| GET | `/documents/:id` | Consultar un documento | Público |
+| GET | `/documents/application/:applicationId` | Consultar documentos de una solicitud | Público |
+| POST | `/documents` | Crear documento | JWT |
+| PATCH | `/documents/:id` | Actualizar documento | JWT |
+| PATCH | `/documents/:id/status` | Cambiar estado | JWT |
+| DELETE | `/documents/:id` | Eliminar documento | JWT |
 
-| Método | Endpoint | Descripción |
-|---|---|---|
-| GET | `/tracking` | Consultar seguimientos |
-| GET | `/tracking/:id` | Consultar seguimiento |
-| GET | `/tracking/application/:applicationId` | Consultar seguimientos de una solicitud |
-| POST | `/tracking` | Crear seguimiento |
-| PATCH | `/tracking/:id` | Actualizar seguimiento |
-| DELETE | `/tracking/:id` | Eliminar seguimiento |
+### 8.5. Tracking
 
-### Auth
+| Método | Endpoint | Descripción | Acceso |
+|---|---|---|---|
+| GET | `/tracking` | Consultar seguimientos | Público |
+| GET | `/tracking/:id` | Consultar un seguimiento | Público |
+| GET | `/tracking/application/:applicationId` | Consultar seguimiento de una solicitud | Público |
+| POST | `/tracking` | Crear seguimiento | JWT |
+| PATCH | `/tracking/:id` | Actualizar seguimiento | JWT |
+| DELETE | `/tracking/:id` | Eliminar seguimiento | JWT |
 
-| Método | Endpoint | Descripción |
-|---|---|---|
-| POST | `/auth/register` | Registrar usuario |
-| POST | `/auth/login` | Iniciar sesión y obtener JWT |
+### 8.6. Auth
 
-La protección efectiva de cada endpoint depende de los guards y decoradores definidos en los controladores.
+| Método | Endpoint | Descripción | Acceso |
+|---|---|---|---|
+| POST | `/auth/register` | Registrar usuario | Público |
+| POST | `/auth/login` | Iniciar sesión y obtener JWT | Público |
 
-## 8. Búsqueda, filtros, ordenamiento y paginación
+### 8.7. Ruta principal
 
-Las consultas utilizan DTOs y servicios con TypeORM para procesar los parámetros admitidos por cada recurso.
+| Método | Endpoint | Descripción | Acceso |
+|---|---|---|---|
+| GET | `/` | Verificar la respuesta principal de la API | Público |
 
-Parámetros habituales:
+Las rutas de escritura indicadas como JWT están protegidas mediante `JwtAuthGuard`. El registro y el inicio de sesión son públicos porque permiten obtener las credenciales necesarias para acceder a las operaciones protegidas.
+
+## 9. Búsquedas, filtros, ordenamiento y paginación
+
+Los módulos de consulta utilizan DTOs específicos para definir los parámetros admitidos y validar sus valores.
+
+### Parámetros de consulta
+
+Según el recurso, se admiten parámetros como:
 
 - `search`: búsqueda por texto.
-- `studentId`, `scholarshipId` y `applicationId`: filtros por relaciones.
-- `status`, `career`, `semester` e `isActive`: filtros específicos.
-- `page` y `limit`: paginación.
-- `sortBy` y `order`: ordenamiento.
+- `career`: filtro por carrera.
+- `semester`: filtro por semestre.
+- `isActive`: filtro por estado de actividad.
+- `studentId`: filtro por estudiante.
+- `scholarshipId`: filtro por beca.
+- `applicationId`: filtro por solicitud.
+- `status`: filtro por estado.
+- `activeOnly`: filtro relacionado con el estado activo del estudiante en las solicitudes.
+- `page`: número de página.
+- `limit`: cantidad de registros por página.
+- `sortBy`: campo permitido para ordenar.
+- `order`: orden ascendente `ASC` o descendente `DESC`.
 
-Ejemplo de consulta:
+Los parámetros disponibles dependen del módulo. Los campos de ordenamiento se limitan a los permitidos por cada consulta.
+
+### Ejemplo de consulta de becas
 
 ```http
 GET /scholarships?search=beca&isActive=true&page=1&limit=5&sortBy=name&order=ASC
 ```
 
-Ejemplo de consulta de solicitudes:
+### Ejemplo de consulta de solicitudes
 
 ```http
 GET /applications?studentId=1&scholarshipId=1&status=pendiente&page=1&limit=5&sortBy=gpa&order=DESC
 ```
 
-La estructura general de las respuestas paginadas es:
+### Paginación
+
+El parámetro `page` indica la página solicitada y `limit` determina la cantidad máxima de registros por página. Se estableció un límite máximo de 50 registros por página.
+
+La respuesta paginada utiliza una estructura con registros y metadatos:
 
 ```json
 {
@@ -401,17 +480,19 @@ La estructura general de las respuestas paginadas es:
 }
 ```
 
-- `items`: registros de la página.
+Los campos significan:
+
+- `items`: registros devueltos.
 - `total`: total de registros que cumplen los filtros.
 - `page`: página actual.
-- `limit`: máximo de registros por página.
-- `totalPages`: cantidad total de páginas.
+- `limit`: cantidad máxima de registros por página.
+- `totalPages`: número total de páginas.
 
-La validación de consultas restringe la página a valores enteros mayores o iguales a 1 y limita el tamaño de página al intervalo de 1 a 50. Los campos de ordenamiento permitidos dependen del recurso.
+Los valores fuera de los límites y los parámetros no permitidos se rechazan mediante las validaciones configuradas.
 
-## 9. Validaciones y manejo de errores
+## 10. Validación y manejo de errores HTTP
 
-La aplicación utiliza un `ValidationPipe` global en `main.ts`:
+La aplicación utiliza un `ValidationPipe` global configurado para transformar los valores de entrada, validar los DTOs y rechazar propiedades no permitidas.
 
 ```ts
 app.useGlobalPipes(
@@ -423,45 +504,35 @@ app.useGlobalPipes(
 );
 ```
 
-Esta configuración transforma los datos de entrada, valida los DTOs y rechaza propiedades no permitidas.
+### Códigos HTTP utilizados
 
-| Código HTTP | Significado |
+| Código | Significado |
 |---|---|
-| `400 Bad Request` | Datos o parámetros inválidos |
-| `401 Unauthorized` | Falta de autenticación válida o credenciales incorrectas |
+| `400 Bad Request` | Datos de entrada o parámetros inválidos |
+| `401 Unauthorized` | Credenciales incorrectas o autenticación no válida |
 | `404 Not Found` | Recurso inexistente |
-| `409 Conflict` | Conflicto, por ejemplo, correo duplicado |
+| `409 Conflict` | Conflicto, como un correo o una solicitud duplicados |
 
-Se realizaron pruebas de validación de datos, manejo de recursos inexistentes, prevención de duplicados y autenticación.
+Los servicios utilizan excepciones de NestJS para gestionar los errores y devolver respuestas HTTP apropiadas.
 
-## 10. PostgreSQL, variables de entorno y migraciones
+## 11. Configuración de PostgreSQL y variables de entorno
 
-La base de datos utilizada durante el desarrollo local es:
+La aplicación utiliza PostgreSQL como sistema de persistencia.
+
+Configuración local de referencia:
 
 ```text
-Nombre: SG_Becas_ULEAM
 Host: localhost
 Puerto: 5432
+Base de datos: SG_Becas_ULEAM
 Usuario: postgres
 ```
 
-Tablas principales:
-
-```text
-students
-scholarships
-applications
-documents
-tracking
-users
-migrations
-```
+Las credenciales se configuran mediante variables de entorno. El archivo `.env` debe mantenerse local y excluido del repositorio.
 
 ### Variables de entorno
 
-El archivo `.env` contiene la configuración local de PostgreSQL y JWT. Los nombres de las variables deben coincidir con los utilizados en la configuración del proyecto.
-
-Ejemplo ilustrativo:
+El archivo `.env.example` sirve como plantilla para configurar el entorno local:
 
 ```env
 NODE_ENV=development
@@ -471,15 +542,15 @@ DATABASE_HOST=localhost
 DATABASE_PORT=5432
 DATABASE_NAME=SG_Becas_ULEAM
 DATABASE_USER=postgres
-DATABASE_PASSWORD=tu_contraseña_local
+DATABASE_PASSWORD=replace-with-your-local-password
 
-JWT_SECRET=un_secreto_aleatorio_y_privado
+JWT_SECRET=replace-with-a-random-secret-of-at-least-32-characters
 JWT_EXPIRES_IN=3600
 ```
 
-Los valores son ejemplos y no deben sustituir las credenciales locales reales.
+Los valores anteriores son ejemplos. Cada integrante debe configurar sus propias credenciales y un secreto JWT privado.
 
-El archivo `.env` debe permanecer excluido del control de versiones. El archivo `.env.example` debe contener únicamente valores de ejemplo, sin contraseñas ni secretos reales.
+**No se deben publicar contraseñas reales, tokens activos ni secretos en el repositorio o en las capturas de evidencia.**
 
 ### Configuración de TypeORM
 
@@ -489,29 +560,75 @@ La configuración de entrega utiliza:
 synchronize: false
 ```
 
-Los cambios de esquema se gestionan mediante migraciones, evitando que TypeORM modifique automáticamente las tablas al iniciar la aplicación.
+De esta forma, TypeORM no modifica automáticamente el esquema de la base de datos al iniciar la aplicación. Los cambios estructurales se gestionan mediante migraciones versionadas.
 
-### Migraciones
+## 12. Migraciones de TypeORM
 
-La fuente de datos para las migraciones se encuentra en `src/data-source.ts`.
+Las migraciones permiten crear y modificar el esquema de PostgreSQL de forma controlada y reproducible.
 
-Comandos disponibles:
+La fuente de datos está definida en:
+
+```text
+src/data-source.ts
+```
+
+Las migraciones del proyecto se encuentran en:
+
+```text
+src/migrations/
+```
+
+Entre las migraciones implementadas se encuentran:
+
+- `1791676800000-InitialSchema.ts`: crea el esquema inicial de estudiantes, becas, solicitudes, documentos y seguimiento.
+- `1791725363913-CreateUsersTable.ts`: crea la tabla de usuarios.
+
+### Comandos de migración
+
+Consultar el historial:
 
 ```bash
-npm run migration:generate -- src/migrations/NombreMigracion
+npx typeorm-ts-node-esm migration:show -d src/data-source.ts
+```
+
+Ejecutar las migraciones pendientes:
+
+```bash
 npm run migration:run
+```
+
+Revertir la última migración:
+
+```bash
 npm run migration:revert
 ```
 
-`migration:revert` revierte la última migración ejecutada y debe utilizarse con precaución.
+Generar una migración:
 
-La migración de creación de usuarios se ejecutó correctamente en la base de desarrollo.
+```bash
+npm run migration:generate -- src/migrations/NombreMigracion
+```
 
-## 11. Autenticación y seguridad JWT
+Los comandos deben ejecutarse con la configuración de base de datos correcta. Antes de generar o ejecutar migraciones, se debe comprobar que `DATABASE_NAME` apunta a la base de datos deseada.
 
-La autenticación utiliza bcrypt para almacenar hashes de contraseñas y JWT para proteger rutas seleccionadas.
+### Verificación
 
-### Registro
+La ejecución de las dos migraciones se comprobó en una base de datos de prueba independiente. El historial mostró ambas migraciones como ejecutadas:
+
+```text
+[X] 1 InitialSchema1791676800000
+[X] 2 CreateUsersTable1791725363913
+```
+
+Esta prueba permite comprobar que el esquema puede construirse desde cero mediante las migraciones, sin depender de `synchronize: true`.
+
+## 13. Registro y autenticación JWT
+
+El sistema utiliza bcrypt para proteger las contraseñas y JWT para autenticar las peticiones a las rutas protegidas.
+
+### Registro de usuario
+
+Endpoint:
 
 ```http
 POST /auth/register
@@ -527,7 +644,11 @@ Ejemplo de cuerpo:
 }
 ```
 
+El correo debe ser único. El sistema almacena el hash de la contraseña, no la contraseña en texto plano.
+
 ### Inicio de sesión
+
+Endpoint:
 
 ```http
 POST /auth/login
@@ -543,31 +664,48 @@ Ejemplo de cuerpo:
 }
 ```
 
-Cuando las credenciales son correctas, la API devuelve un `access_token`.
+Con credenciales válidas, la API devuelve un token JWT.
 
-Para acceder a una ruta protegida se utiliza el encabezado:
+### Uso del token
+
+Para realizar una petición a una ruta protegida, se envía el token en el encabezado:
 
 ```http
 Authorization: Bearer <token_jwt>
 ```
 
-No deben publicarse tokens reales, contraseñas ni secretos JWT en el README o en el repositorio.
+`JwtAuthGuard` y `JwtStrategy` verifican la autenticación antes de permitir el acceso.
 
-### Pruebas de seguridad realizadas
+### Pruebas de autenticación realizadas
 
-Se verificaron escenarios como el registro duplicado, el rechazo de credenciales incorrectas, las solicitudes sin token y las operaciones autenticadas con datos válidos e inválidos.
+Se comprobó el comportamiento de la API en los siguientes escenarios:
 
-También se comprobó el rechazo de una solicitud sin token y la creación autenticada de un documento.
+- Registro de usuarios.
+- Rechazo de correos duplicados.
+- Rechazo de credenciales incorrectas con `401 Unauthorized`.
+- Rechazo de solicitudes a rutas protegidas sin autenticación.
+- Creación autenticada de documentos.
+- Rechazo de solicitudes duplicadas con `409 Conflict`.
 
-## 12. Pruebas automatizadas y compilación
+La comprobación de tokens inválidos o expirados debe documentarse como realizada únicamente cuando se haya ejecutado la prueba correspondiente.
 
-Se ejecutaron las pruebas automatizadas con Vitest:
+## 14. Pruebas automatizadas y compilación
+
+El proyecto utiliza Vitest para ejecutar las pruebas automatizadas.
+
+Ejecutar las pruebas:
+
+```bash
+npm test
+```
+
+Ejecutarlas con detalle:
 
 ```bash
 npm test -- --reporter=verbose
 ```
 
-Resultado de la ejecución más reciente:
+Resultado de la ejecución compartida:
 
 | Indicador | Resultado |
 |---|---:|
@@ -575,127 +713,152 @@ Resultado de la ejecución más reciente:
 | Pruebas aprobadas | 69 |
 | Pruebas fallidas | 0 |
 
-Los servicios de estudiantes, becas, solicitudes, documentos y seguimiento cuentan con pruebas de sus operaciones y comportamientos relevantes, incluidos filtros y paginación en los casos implementados.
-
-También se ejecutó:
+También se comprobó la compilación del backend mediante:
 
 ```bash
 npm run build
 ```
 
-La ejecución final compartida no mostró errores de compilación.
+La ejecución compartida finalizó sin errores de compilación.
 
-## 13. Instalación y ejecución
+Las pruebas manuales de los endpoints se realizaron mediante Thunder Client, mientras que las pruebas automatizadas permiten verificar los comportamientos implementados en los módulos y servicios.
 
-Clonar el repositorio:
+## 15. Instalación y ejecución
+
+### Requisitos previos
+
+- Node.js y npm instalados.
+- PostgreSQL instalado y en ejecución.
+- Acceso a una base de datos PostgreSQL.
+- Git para clonar el repositorio.
+
+### Clonar el repositorio
 
 ```bash
 git clone https://github.com/GabrielGL11/proyecto_asw.git
-```
-
-Entrar al proyecto:
-
-```bash
 cd proyecto_asw
 ```
 
-Instalar dependencias:
+### Instalar dependencias
 
 ```bash
 npm install
 ```
 
-Crear el archivo `.env` a partir de `.env.example` y configurar las variables locales.
+### Configurar el entorno
 
-Verificar que PostgreSQL esté ejecutándose y que la base configurada exista.
+Crear un archivo `.env` tomando como referencia `.env.example`.
 
-Iniciar la aplicación:
+Configurar las variables de conexión a PostgreSQL y el secreto JWT. Verificar que la base de datos seleccionada sea la correcta antes de ejecutar las migraciones.
 
-```bash
-npm run start:dev
-```
-
-La aplicación utiliza el puerto configurado en las variables de entorno. El puerto local previsto es `5500`.
-
-## 14. Comandos de comprobación
-
-Compilar:
-
-```bash
-npm run build
-```
-
-Ejecutar todas las pruebas:
-
-```bash
-npm test
-```
-
-Ejecutar pruebas con detalle:
-
-```bash
-npm test -- --reporter=verbose
-```
-
-Ejecutar pruebas end-to-end:
-
-```bash
-npm run test:e2e
-```
-
-Obtener cobertura:
-
-```bash
-npm run test:cov
-```
-
-Ejecutar migraciones pendientes:
+### Aplicar las migraciones
 
 ```bash
 npm run migration:run
 ```
 
-## 15. Documentación y evidencias
+### Iniciar el servidor
 
-La entrega académica debe incluir las evidencias requeridas por la actividad, organizadas por funcionalidad:
+Modo desarrollo:
 
-```text
-Evidencias Entrega 2/
-├── 01-Modelo-Relacional/
-├── 02-Consultas-Filtros/
-├── 03-Paginacion-Ordenamiento/
-├── 04-Validaciones-Errores/
-├── 05-Persistencia-PostgreSQL/
-├── 06-Migraciones/
-├── 07-Registro-Usuarios/
-├── 08-Login-JWT/
-└── 09-Rutas-Protegidas/
+```bash
+npm run start:dev
 ```
 
-El documento Word debe incluir el diagrama relacional, las pruebas realizadas, las credenciales de prueba no sensibles y la tabla definitiva de endpoints protegidos.
+Modo normal:
 
-Las capturas de evidencia no deben mostrar contraseñas reales, secretos JWT ni el contenido sensible de `.env`.
+```bash
+npm run start
+```
 
-## 16. Verificaciones finales de entrega
+Modo producción, después de compilar:
 
-Las funcionalidades principales y las pruebas automatizadas están implementadas. Para cerrar la entrega, resta confirmar los siguientes puntos:
+```bash
+npm run build
+npm run start:prod
+```
 
-- [ ] Comprobar que los datos persisten después de reiniciar la API.
-- [ ] Verificar la reconstrucción del esquema completo en una base de datos independiente mediante migraciones, sin modificar la base de desarrollo.
-- [ ] Confirmar, si aún no se documentó, el rechazo de tokens JWT inválidos y expirados.
-- [ ] Revisar el documento Word y completar las evidencias que exija la rúbrica.
-- [ ] Confirmar que `.env` está excluido de Git y que no hay secretos en los archivos preparados para publicar.
-- [ ] Ejecutar las comprobaciones finales y revisar el estado de Git antes de crear el commit definitivo y sincronizar con GitHub.
+La dirección local prevista para el servidor es:
 
-## 17. Recursos oficiales
+```text
+http://localhost:5500
+```
 
-- [NestJS](https://docs.nestjs.com/)
-- [TypeORM](https://typeorm.io/)
-- [PostgreSQL](https://www.postgresql.org/docs/)
+El puerto efectivo depende de la configuración de entorno utilizada.
+
+## 16. Comandos de comprobación
+
+| Propósito | Comando |
+|---|---|
+| Compilar | `npm run build` |
+| Ejecutar pruebas | `npm test` |
+| Ejecutar pruebas detalladas | `npm test -- --reporter=verbose` |
+| Ejecutar pruebas end-to-end | `npm run test:e2e` |
+| Generar cobertura | `npm run test:cov` |
+| Ejecutar migraciones | `npm run migration:run` |
+| Revertir última migración | `npm run migration:revert` |
+| Consultar migraciones | `npx typeorm-ts-node-esm migration:show -d src/data-source.ts` |
+
+Los comandos de pruebas end-to-end y cobertura dependen de la configuración y los scripts presentes en `package.json`.
+
+## 17. Evidencias del proyecto
+
+Las evidencias se organizan por entrega en el repositorio:
+
+```text
+Evidencias/
+├── Evidencias Entrega 1/
+└── Evidencias Entrega 2/
+```
+
+Las evidencias de la segunda etapa incluyen capturas relacionadas con:
+
+- Modelo relacional y relaciones entre entidades.
+- Claves foráneas y restricciones.
+- Filtros, búsquedas, paginación y ordenamiento.
+- Configuración de TypeORM.
+- Ejecución de migraciones.
+- Registro de usuarios e inicio de sesión.
+- Protección de rutas mediante JWT.
+- Pruebas automatizadas.
+- Compilación del backend.
+- Persistencia de datos en PostgreSQL.
+
+Repositorio de evidencias:
+
+[https://github.com/GabrielGL11/proyecto_asw/tree/main/Evidencias/Evidencias%20Entrega%202](https://github.com/GabrielGL11/proyecto_asw/tree/main/Evidencias/Evidencias%20Entrega%202)
+
+Las capturas deben corresponder a resultados reales y no deben mostrar credenciales, contraseñas reales, secretos JWT ni tokens activos.
+
+## 18. Verificaciones de entrega
+
+Antes de una nueva entrega o demostración, se recomienda confirmar los siguientes puntos:
+
+- [x] Relaciones entre las entidades principales.
+- [x] Claves foráneas y restricciones de integridad.
+- [x] Prevención de solicitudes duplicadas.
+- [x] Consultas con filtros, paginación y ordenamiento.
+- [x] Migraciones verificadas en una base de prueba independiente.
+- [x] Configuración de TypeORM con `synchronize: false` para la entrega.
+- [x] Registro, login y autenticación JWT implementados.
+- [x] Rutas de escritura protegidas mediante JWT.
+- [x] Pruebas automatizadas aprobadas según la ejecución compartida.
+- [x] Compilación sin errores según la ejecución compartida.
+- [x] Archivo `.env` excluido del repositorio.
+- [x] Tabla de endpoints contrastada con los controladores y guards.
+- [x] Revisar que los comandos documentados coincidan con la versión actual de `package.json`.
+- [x] Revisar el estado final de Git antes de realizar el commit y el push.
+
+## 19. Recursos oficiales
+
+- [Documentación de NestJS](https://docs.nestjs.com/)
+- [Repositorio de NestJS](https://github.com/nestjs/nest)
+- [Documentación de TypeORM](https://typeorm.io/)
+- [Documentación de PostgreSQL](https://www.postgresql.org/docs/)
 - [class-validator](https://github.com/typestack/class-validator)
-- [Passport](https://www.passportjs.org/)
+- [Passport.js](https://www.passportjs.org/)
 - [Autenticación en NestJS](https://docs.nestjs.com/security/authentication)
-- [Joi](https://joi.dev/api/)
+- [Documentación de Joi](https://joi.dev/api/)
 
 ---
 
@@ -703,6 +866,16 @@ Las funcionalidades principales y las pruebas automatizadas están implementadas
 
 Proyecto académico desarrollado para la asignatura **Desarrollo Backend Web con NestJS**.
 
-**Universidad Laica Eloy Alfaro de Manabí (ULEAM)**
+**Universidad:** Universidad Laica Eloy Alfaro de Manabí (ULEAM)
 
-Repositorio: [https://github.com/GabrielGL11/proyecto_asw](https://github.com/GabrielGL11/proyecto_asw)
+**Integrantes:**
+
+- Jose Gabriel Alava Barcia
+- Anthony Gabriel Guaman Lucio
+- Jordan Josue Solorzano Zambrano
+
+**Carrera:** Software, 5.º “B”
+
+**Docente:** Ing. Joffre Edgardo Panchana Flores, Mg.
+
+**Repositorio:** [https://github.com/GabrielGL11/proyecto_asw](https://github.com/GabrielGL11/proyecto_asw)
