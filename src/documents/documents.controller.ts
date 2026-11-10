@@ -4,6 +4,7 @@ import { DocumentsService } from './documents.service.js';
 import { CreateDocumentDto } from './dto/create-document.dto.js';
 import { DocumentsQueryDto } from './dto/documents-query.dto.js';
 import { UpdateDocumentDto } from './dto/update-document.dto.js';
+import { UpdateDocumentStatusDto } from './dto/update-document-status.dto.js';
 import { ParseDocumentIdPipe } from './pipes/parse-document-id.pipe.js';
 
 @Controller('documents')
@@ -39,8 +40,11 @@ export class DocumentsController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id/status')
-  updateStatus(@Param('id', ParseDocumentIdPipe) id: number, @Body('status') status: string) {
-    return this.documentsService.updateStatus(id, status as any);
+  updateStatus(
+    @Param('id', ParseDocumentIdPipe) id: number,
+    @Body() dto: UpdateDocumentStatusDto,
+  ) {
+    return this.documentsService.updateStatus(id, dto.status);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -87,7 +87,7 @@ Se incorporaron las funcionalidades de la segunda etapa:
 | `@nestjs/config` | Configuración mediante variables de entorno |
 | `class-validator` | Validación de datos |
 | `class-transformer` | Transformación de datos |
-| Joi | Validación de configuración, cuando corresponda |
+| Joi | Validación de las variables de entorno al arrancar |
 | `@nestjs/jwt` | Generación y manejo de JWT |
 | `@nestjs/passport` | Integración de Passport con NestJS |
 | `passport-jwt` | Estrategia JWT |
@@ -118,7 +118,7 @@ src/
 └── main.ts
 ```
 
-Cada módulo contiene los componentes necesarios para gestionar su recurso, según su implementación.
+Cada módulo contiene su controller, service, DTOs y entidad.
 
 ### Responsabilidades
 
@@ -687,7 +687,7 @@ Se comprobó el comportamiento de la API en los siguientes escenarios:
 - Creación autenticada de documentos.
 - Rechazo de solicitudes duplicadas con `409 Conflict`.
 
-La comprobación de tokens inválidos o expirados debe documentarse como realizada únicamente cuando se haya ejecutado la prueba correspondiente.
+También se comprobó el rechazo de un token inválido con `401 Unauthorized`.
 
 ## 14. Pruebas automatizadas y compilación
 
@@ -830,9 +830,9 @@ Repositorio de evidencias:
 
 Las capturas deben corresponder a resultados reales y no deben mostrar credenciales, contraseñas reales, secretos JWT ni tokens activos.
 
-## 18. Verificaciones de entrega
+## 18. Verificaciones realizadas antes de la entrega
 
-Antes de una nueva entrega o demostración, se recomienda confirmar los siguientes puntos:
+Antes de la entrega se confirmaron los siguientes puntos:
 
 - [x] Relaciones entre las entidades principales.
 - [x] Claves foráneas y restricciones de integridad.
