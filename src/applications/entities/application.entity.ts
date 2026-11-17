@@ -4,6 +4,7 @@ import type { Student } from '../../students/entities/students.entity.js';
 import type { Scholarship } from '../../scholarships/entities/scholarship.entity.js';
 import type { Document } from '../../documents/entities/document.entity.js';
 import type { Tracking } from '../../tracking/entities/tracking.entity.js';
+import type { User } from '../../users/entities/user.entity.js';
 
 export type ApplicationStatus =
   | 'pendiente'
@@ -32,6 +33,10 @@ export type ApplicationStatus =
 
     @Column({ nullable: true })
     comment?: string;
+
+    // Propietario: usuario autenticado que creó la solicitud (nunca viene del cuerpo).
+    @Column({ type: 'int', nullable: true })
+    createdByUserId: number | null;
 
     @Column({
       type: 'enum',
@@ -67,6 +72,13 @@ export type ApplicationStatus =
     )
     @JoinColumn({ name: 'scholarshipId' })
     scholarship: Relation<Scholarship>;
+
+    @ManyToOne('User', {
+      nullable: true,
+      onDelete: 'SET NULL',
+    })
+    @JoinColumn({ name: 'createdByUserId' })
+    createdBy: Relation<User> | null;
 
     @OneToMany(
       'Document',

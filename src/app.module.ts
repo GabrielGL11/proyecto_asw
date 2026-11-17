@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import Joi from 'joi';
@@ -10,6 +12,7 @@ import { ApplicationsModule } from './applications/applications.module.js';
 import { DocumentsModule } from './documents/documents.module.js';
 import { TrackingModule } from './tracking/tracking.module.js';
 import { AuthModule } from './auth/auth.module.js';
+import { UsersModule } from './users/users.module.js';
 
 @Module({
   imports: [
@@ -29,6 +32,8 @@ import { AuthModule } from './auth/auth.module.js';
 
         JWT_SECRET: Joi.string().min(32).required(),
         JWT_EXPIRES_IN: Joi.string().default('3600'),
+
+        CORS_ORIGINS: Joi.string().default('http://localhost:5173'),
       }),
     }),
 
@@ -47,14 +52,18 @@ import { AuthModule } from './auth/auth.module.js';
       }),
     }),
 
+    // Límite global por IP: 60 solicitudes por minuto. El login es más estricto.
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 60 }]),
+
     ScholarshipsModule,
     StudentsModule,
     ApplicationsModule,
     DocumentsModule,
     TrackingModule,
     AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

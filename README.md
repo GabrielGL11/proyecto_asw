@@ -74,6 +74,20 @@ Se incorporaron las funcionalidades de la segunda etapa:
 - Estrategia y guard de autenticación.
 - Protección de operaciones de escritura.
 
+### Etapa 3 — Autorización, seguridad y arquitectura
+
+Se incorporaron las funcionalidades de la tercera etapa (semanas 9 a 11):
+
+- JWT con `accessToken`, `GET /auth/me` e identidad segura en `req.user`.
+- Roles cerrados (`admin`, `reviewer`, `student`) con `RolesGuard` y `@Roles()`.
+- Ruta exclusiva de administración (`/users`) y regla de propiedad en solicitudes.
+- CORS por entorno, limitación de solicitudes (`429`) y requisito de HTTPS/TLS.
+- Middleware de registro, filtro global de errores e interceptor de tiempo.
+- Caso de uso con puerto de repositorio y adaptador TypeORM.
+- Respuestas `409` para correos duplicados y eliminaciones con solicitudes asociadas.
+
+Detalle en las secciones 19 y 20.
+
 ## 4. Tecnologías utilizadas
 
 | Tecnología | Uso |
@@ -110,6 +124,7 @@ src/
 ├── applications/
 ├── documents/
 ├── tracking/
+├── common/            (filtro de errores, middleware, interceptor)
 ├── migrations/
 ├── data-source.ts
 ├── app.module.ts
@@ -353,7 +368,7 @@ La entidad configura la contraseña para que no se seleccione en las consultas h
 
 ## 8. Endpoints de la API
 
-La API utiliza métodos HTTP para consultar, crear, actualizar y eliminar recursos.
+La API utiliza métodos HTTP para consultar, crear, actualizar y eliminar recursos. La columna **Acceso** indica qué se exige en el servidor: `Público`, `JWT` (cualquier usuario autenticado) o `JWT + rol`.
 
 ### 8.1. Students
 
@@ -361,9 +376,9 @@ La API utiliza métodos HTTP para consultar, crear, actualizar y eliminar recurs
 |---|---|---|---|
 | GET | `/students` | Consultar estudiantes | Público |
 | GET | `/students/:id` | Consultar un estudiante | Público |
-| POST | `/students` | Crear estudiante | JWT |
-| PATCH | `/students/:id` | Actualizar estudiante | JWT |
-| DELETE | `/students/:id` | Eliminar estudiante | JWT |
+| POST | `/students` | Crear estudiante | JWT + `admin`/`reviewer` |
+| PATCH | `/students/:id` | Actualizar estudiante | JWT + `admin`/`reviewer` |
+| DELETE | `/students/:id` | Eliminar estudiante (`409` si tiene solicitudes) | JWT + `admin` |
 
 ### 8.2. Scholarships
 
@@ -371,9 +386,9 @@ La API utiliza métodos HTTP para consultar, crear, actualizar y eliminar recurs
 |---|---|---|---|
 | GET | `/scholarships` | Consultar becas | Público |
 | GET | `/scholarships/:id` | Consultar una beca | Público |
-| POST | `/scholarships` | Crear beca | JWT |
-| PATCH | `/scholarships/:id` | Actualizar beca | JWT |
-| DELETE | `/scholarships/:id` | Eliminar beca | JWT |
+| POST | `/scholarships` | Crear beca | JWT + `admin` |
+| PATCH | `/scholarships/:id` | Actualizar beca | JWT + `admin` |
+| DELETE | `/scholarships/:id` | Eliminar beca (`409` si tiene solicitudes) | JWT + `admin` |
 
 ### 8.3. Applications
 
@@ -381,12 +396,14 @@ La API utiliza métodos HTTP para consultar, crear, actualizar y eliminar recurs
 |---|---|---|---|
 | GET | `/applications` | Consultar solicitudes | Público |
 | GET | `/applications/:id` | Consultar una solicitud | Público |
-| GET | `/applications/student/:studentId` | Consultar solicitudes de un estudiante | Público |
-| GET | `/applications/scholarship/:scholarshipId` | Consultar solicitudes de una beca | Público |
-| POST | `/applications` | Crear solicitud | JWT |
-| PATCH | `/applications/:id` | Actualizar solicitud | JWT |
-| PATCH | `/applications/:id/status` | Cambiar estado | JWT |
-| DELETE | `/applications/:id` | Eliminar solicitud | JWT |
+| GET | `/applications/student/:studentId` | Solicitudes de un estudiante | Público |
+| GET | `/applications/scholarship/:scholarshipId` | Solicitudes de una beca | Público |
+| POST | `/applications` | Crear solicitud (el usuario queda como propietario) | JWT |
+| PATCH | `/applications/:id` | Actualizar solicitud (`403` si no es admin, revisor ni propietario) | JWT + propiedad |
+| PATCH | `/applications/:id/status` | Cambiar estado | JWT + `admin`/`reviewer` |
+| DELETE | `/applications/:id` | Eliminar solicitud | JWT + `admin` |
+
+`PATCH /applications/:id` ya no permite cambiar `studentId` ni `scholarshipId`: el DTO los rechaza con `400`.
 
 ### 8.4. Documents
 
@@ -394,11 +411,11 @@ La API utiliza métodos HTTP para consultar, crear, actualizar y eliminar recurs
 |---|---|---|---|
 | GET | `/documents` | Consultar documentos | Público |
 | GET | `/documents/:id` | Consultar un documento | Público |
-| GET | `/documents/application/:applicationId` | Consultar documentos de una solicitud | Público |
+| GET | `/documents/application/:applicationId` | Documentos de una solicitud | Público |
 | POST | `/documents` | Crear documento | JWT |
-| PATCH | `/documents/:id` | Actualizar documento | JWT |
-| PATCH | `/documents/:id/status` | Cambiar estado | JWT |
-| DELETE | `/documents/:id` | Eliminar documento | JWT |
+| PATCH | `/documents/:id` | Actualizar documento | JWT + `admin`/`reviewer` |
+| PATCH | `/documents/:id/status` | Cambiar estado | JWT + `admin`/`reviewer` |
+| DELETE | `/documents/:id` | Eliminar documento | JWT + `admin`/`reviewer` |
 
 ### 8.5. Tracking
 
@@ -406,25 +423,33 @@ La API utiliza métodos HTTP para consultar, crear, actualizar y eliminar recurs
 |---|---|---|---|
 | GET | `/tracking` | Consultar seguimientos | Público |
 | GET | `/tracking/:id` | Consultar un seguimiento | Público |
-| GET | `/tracking/application/:applicationId` | Consultar seguimiento de una solicitud | Público |
-| POST | `/tracking` | Crear seguimiento | JWT |
-| PATCH | `/tracking/:id` | Actualizar seguimiento | JWT |
-| DELETE | `/tracking/:id` | Eliminar seguimiento | JWT |
+| GET | `/tracking/application/:applicationId` | Seguimiento de una solicitud | Público |
+| POST | `/tracking` | Crear seguimiento | JWT + `admin`/`reviewer` |
+| PATCH | `/tracking/:id` | Actualizar seguimiento | JWT + `admin`/`reviewer` |
+| DELETE | `/tracking/:id` | Eliminar seguimiento | JWT + `admin`/`reviewer` |
 
 ### 8.6. Auth
 
 | Método | Endpoint | Descripción | Acceso |
 |---|---|---|---|
-| POST | `/auth/register` | Registrar usuario | Público |
-| POST | `/auth/login` | Iniciar sesión y obtener JWT | Público |
+| POST | `/auth/register` | Registrar usuario (siempre con rol `student`) | Público |
+| POST | `/auth/login` | Iniciar sesión (máx. 5 por minuto, luego `429`) | Público |
+| GET | `/auth/me` | Identidad autenticada (`id`, `email`, `role`) | JWT |
 
-### 8.7. Ruta principal
+### 8.7. Users (administración)
+
+| Método | Endpoint | Descripción | Acceso |
+|---|---|---|---|
+| GET | `/users` | Listar usuarios | JWT + `admin` |
+| PATCH | `/users/:id/role` | Cambiar el rol de un usuario | JWT + `admin` |
+
+### 8.8. Ruta principal
 
 | Método | Endpoint | Descripción | Acceso |
 |---|---|---|---|
 | GET | `/` | Verificar la respuesta principal de la API | Público |
 
-Las rutas de escritura indicadas como JWT están protegidas mediante `JwtAuthGuard`. El registro y el inicio de sesión son públicos porque permiten obtener las credenciales necesarias para acceder a las operaciones protegidas.
+El registro y el inicio de sesión son públicos porque permiten obtener las credenciales necesarias para acceder a las operaciones protegidas.
 
 ## 9. Búsquedas, filtros, ordenamiento y paginación
 
@@ -510,8 +535,23 @@ app.useGlobalPipes(
 |---|---|
 | `400 Bad Request` | Datos de entrada o parámetros inválidos |
 | `401 Unauthorized` | Credenciales incorrectas o autenticación no válida |
+| `403 Forbidden` | Identidad válida sin permiso (rol o propiedad) |
 | `404 Not Found` | Recurso inexistente |
-| `409 Conflict` | Conflicto, como un correo o una solicitud duplicados |
+| `409 Conflict` | Conflicto: correo duplicado, solicitud duplicada o eliminación de un recurso con solicitudes asociadas |
+| `429 Too Many Requests` | Se superó el límite de solicitudes |
+| `500 Internal Server Error` | Error inesperado (sin detalles internos en la respuesta) |
+
+Todas las respuestas de error tienen la misma forma (filtro global `HttpErrorFilter`):
+
+```json
+{
+  "statusCode": 404,
+  "error": "Not Found",
+  "message": "No se encontró el estudiante con ID 999",
+  "path": "/students/999",
+  "timestamp": "2026-11-16T15:00:00.000Z"
+}
+```
 
 Los servicios utilizan excepciones de NestJS para gestionar los errores y devolver respuestas HTTP apropiadas.
 
@@ -546,7 +586,11 @@ DATABASE_PASSWORD=replace-with-your-local-password
 
 JWT_SECRET=replace-with-a-random-secret-of-at-least-32-characters
 JWT_EXPIRES_IN=3600
+
+CORS_ORIGINS=http://localhost:5173
 ```
+
+`CORS_ORIGINS` admite varios orígenes separados por coma. Solo esos orígenes podrán leer respuestas desde un navegador.
 
 Los valores anteriores son ejemplos. Cada integrante debe configurar sus propias credenciales y un secreto JWT privado.
 
@@ -664,7 +708,18 @@ Ejemplo de cuerpo:
 }
 ```
 
-Con credenciales válidas, la API devuelve un token JWT.
+Con credenciales válidas, la API devuelve un token JWT y una representación segura del usuario:
+
+```json
+{
+  "accessToken": "<token_jwt>",
+  "user": { "id": 1, "email": "usuario@example.com", "role": "student" }
+}
+```
+
+El payload del token contiene solo `sub` y `email` (sin contraseña, hash ni rol). El rol se consulta en la base de datos en cada solicitud, por lo que un cambio de rol surte efecto de inmediato. Con credenciales incorrectas responde `401` sin emitir token.
+
+`GET /auth/me` con el encabezado `Authorization: Bearer <token>` devuelve la identidad autenticada.
 
 ### Uso del token
 
@@ -849,7 +904,96 @@ Antes de la entrega se confirmaron los siguientes puntos:
 - [x] Revisar que los comandos documentados coincidan con la versión actual de `package.json`.
 - [x] Revisar el estado final de Git antes de realizar el commit y el push.
 
-## 19. Recursos oficiales
+## 19. Autorización y seguridad (Etapa 3)
+
+La autenticación responde «¿quién eres?»; la autorización, «¿puedes hacer esto aquí y ahora?». Ambas se aplican en el servidor.
+
+### Roles
+
+| Rol | Descripción |
+|---|---|
+| `student` | Valor por defecto de toda cuenta nueva (menor privilegio). Crea solicitudes y modifica las suyas. |
+| `reviewer` | Personal del comité de becas: gestiona estudiantes, estados, documentos y seguimiento. |
+| `admin` | Administra becas, usuarios, roles y eliminaciones. |
+
+El rol **nunca** se acepta en el registro: `POST /auth/register` rechaza cualquier campo `role` (`400`). Solo un administrador cambia roles con `PATCH /users/:id/role`.
+
+### Matriz de acceso
+
+| Acción | Sin token | student ajeno | student propietario | reviewer | admin |
+|---|---|---|---|---|---|
+| `PATCH /applications/:id` | 401 | 403 | 200 | 200 | 200 |
+| `PATCH /applications/:id/status` | 401 | 403 | 403 | 200 | 200 |
+| `DELETE /applications/:id` | 401 | 403 | 403 | 403 | 200 |
+| `POST/PATCH/DELETE /scholarships` | 401 | 403 | 403 | 403 | 200 |
+| `GET /users`, `PATCH /users/:id/role` | 401 | 403 | 403 | 403 | 200 |
+
+### Propiedad de recursos
+
+`POST /applications` guarda en `createdByUserId` el id del usuario autenticado (nunca se toma del cuerpo). `UpdateApplicationUseCase` permite modificar una solicitud solo a un administrador, un revisor o a su propietario; en otro caso lanza `403`. Las solicitudes creadas antes de esta etapa no tienen propietario y solo las modifican `admin` y `reviewer`.
+
+### Crear el primer administrador
+
+Registra una cuenta con `POST /auth/register` y promuévela directamente en la base de datos (después podrá asignar roles por la API):
+
+```sql
+UPDATE users SET role = 'admin' WHERE email = 'admin@example.com';
+```
+
+### CORS
+
+`app.enableCors` admite únicamente los orígenes de `CORS_ORIGINS`, los métodos `GET, POST, PATCH, DELETE` y los encabezados `Content-Type` y `Authorization`. CORS **no** es autorización: no impide llamadas desde Postman, Thunder Client o un servidor; por eso JWT y roles se siguen exigiendo.
+
+### Limitación de solicitudes
+
+`@nestjs/throttler` aplica un límite global de 60 solicitudes por minuto por IP y uno más estricto en `POST /auth/login`: 5 por minuto. El sexto intento recibe `429 Too Many Requests` sin revelar si el correo o la contraseña eran correctos.
+
+### HTTPS / TLS (requisito de producción)
+
+En desarrollo se usa `http://localhost`. **En producción la API debe servirse únicamente por HTTPS/TLS**, normalmente con terminación TLS en un proxy, balanceador o la plataforma de despliegue. Sin HTTPS un token Bearer puede ser interceptado aunque su firma sea válida. Los secretos (`JWT_SECRET`, credenciales de base de datos) viven solo en variables de entorno del servidor y nunca en el repositorio.
+
+## 20. Arquitectura y componentes transversales (Etapa 3)
+
+### Componentes transversales
+
+| Componente | Archivo | Función |
+|---|---|---|
+| Middleware | `src/common/middleware/request-logger.middleware.ts` | Registra método, ruta, estado y duración. No registra encabezados, cuerpos ni tokens. |
+| Filter global | `src/common/filters/http-error.filter.ts` | Respuesta de error uniforme; no expone trazas ni SQL (los errores inesperados salen como `500` genérico). |
+| Interceptor | `src/common/interceptors/timing.interceptor.ts` | Añade el encabezado `X-Response-Time`. |
+| Pipes | `ValidationPipe` global y `ParseXxxIdPipe` | Validan DTOs e identificadores (`400`). |
+
+### Módulo en capas: Applications (actualizar solicitud)
+
+```text
+ApplicationsController            ← HTTP (rutas, guards, DTOs)
+        ↓
+UpdateApplicationUseCase          ← regla de negocio + propiedad
+        ↓
+ApplicationRepository (puerto)    ← src/applications/domain/application.repository.ts
+        ↓
+TypeOrmApplicationRepository      ← adaptador técnico (TypeORM)
+        ↓
+PostgreSQL
+```
+
+- Si cambia la regla «solo el propietario puede editar», cambia **`UpdateApplicationUseCase`**.
+- Si se reemplaza TypeORM, cambia **`TypeOrmApplicationRepository`**.
+- El controlador conserva el contrato HTTP.
+
+### Migración de la etapa
+
+`AddRolesAndApplicationOwner` crea el tipo `users_role_enum`, la columna `users.role` (por defecto `student`) y `applications.createdByUserId` con su clave foránea (`ON DELETE SET NULL`). Aplicar con `npm run migration:run`.
+
+### Verificaciones de la Etapa 3 (completar tras ejecutar)
+
+- [ ] `npm install @nestjs/throttler` ejecutado y `package.json`/`package-lock.json` actualizados.
+- [ ] `npm run migration:run` aplicado en la base local.
+- [ ] `npm test` y `npm run build` sin errores.
+- [ ] Demostración de la matriz de acceso (ver `docs/ETAPA_3_DEMOSTRACION.md`).
+- [ ] Evidencias guardadas en `Evidencias/Evidencias Entrega 3/`.
+
+## 21. Recursos oficiales
 
 - [Documentación de NestJS](https://docs.nestjs.com/)
 - [Repositorio de NestJS](https://github.com/nestjs/nest)

@@ -1,5 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RolesGuard } from '../auth/guards/roles.guard.js';
+import { Roles } from '../auth/decorators/roles.decorator.js';
+import { UserRole } from '../users/user-role.enum.js';
 import { ScholarshipsService } from './scholarships.service.js';
 import { CreateScholarshipDto } from './dto/create-scholarship.dto.js';
 import { UpdateScholarshipDto } from './dto/update-scholarship.dto.js';
@@ -19,12 +22,14 @@ export class ScholarshipsController {
     findOne(@Param('id', ParseScholarshipIdPipe) id: number) {
         return this.scholarshipsService.findOne(id);
     }
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(UserRole.ADMIN)
     @Post()
     create(@Body() createScholarshipDto: CreateScholarshipDto) {
         return this.scholarshipsService.create(createScholarshipDto);
     }
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(UserRole.ADMIN)
     @Patch(':id')
     update(
         @Param('id', ParseScholarshipIdPipe) id: number,
@@ -32,7 +37,8 @@ export class ScholarshipsController {
     ) {
         return this.scholarshipsService.update(id, updateScholarshipDto);
     }
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(UserRole.ADMIN)
     @Delete(':id')
     remove(@Param('id', ParseScholarshipIdPipe) id: number) {
         return this.scholarshipsService.remove(id);

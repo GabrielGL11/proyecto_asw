@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { UsersService } from '../users/users.service.js';
+import { UserRole } from '../users/user-role.enum.js';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +26,12 @@ export class AuthService {
     const password = await bcrypt.hash(registerDto.password, 10);
     const user = await this.usersService.create(registerDto.email, password);
 
-    return { id: user.id, email: user.email };
+    // El rol nunca viene del cuerpo de la petición: toda cuenta nueva es STUDENT.
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role ?? UserRole.STUDENT,
+    };
   }
 
   async login(loginDto: LoginDto) {
@@ -34,11 +40,15 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    const access_token = await this.jwtService.signAsync({
+    // Payload mínimo y explícito: sin contraseña, hash ni rol.
+    const accessToken = await this.jwtService.signAsync({
       sub: user.id,
       email: user.email,
     });
 
-    return { access_token };
+    return {
+      accessToken,
+      user: { id: user.id, email: user.email, role: user.role },
+    };
   }
 }

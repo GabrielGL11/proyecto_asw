@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -185,5 +185,59 @@ describe('StudentsService', () => {
       'student.career ILIKE :career',
       { career: '%Software%' },
     );
+  });
+
+  it('should throw ConflictException when creating a student with a duplicate email', async () => {
+    vi.mocked(repository.save).mockRejectedValueOnce(
+      Object.assign(new Error('duplicate key'), { code: '23505' }),
+    );
+
+    await expect(
+      service.create({
+        firstName: 'Carlos',
+        lastName: 'Mendoza',
+        nationalId: '1300000001',
+        email: 'carlos@example.com',
+        age: 22,
+        career: 'Software',
+        semester: 5,
+        isActive: true,
+      }),
+    ).rejects.toThrow(ConflictException);
+  });
+
+  it('should rethrow unexpected errors when creating a student', async () => {
+    vi.mocked(repository.save).mockRejectedValueOnce(new Error('boom'));
+
+    await expect(
+      service.create({
+        firstName: 'Carlos',
+        lastName: 'Mendoza',
+        nationalId: '1300000001',
+        email: 'carlos@example.com',
+        age: 22,
+        career: 'Software',
+        semester: 5,
+        isActive: true,
+      }),
+    ).rejects.toThrow('boom');
+  });
+
+  it('should throw ConflictException when updating to a duplicate email', async () => {
+    vi.mocked(repository.save).mockRejectedValueOnce(
+      Object.assign(new Error('duplicate key'), { code: '23505' }),
+    );
+
+    await expect(
+      service.update(1, { email: 'otro@example.com' }),
+    ).rejects.toThrow(ConflictException);
+  });
+
+  it('should throw ConflictException when deleting a student with applications', async () => {
+    vi.mocked(repository.remove).mockRejectedValueOnce(
+      Object.assign(new Error('foreign key violation'), { code: '23503' }),
+    );
+
+    await expect(service.remove(1)).rejects.toThrow(ConflictException);
   });
 });

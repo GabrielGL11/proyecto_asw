@@ -5,6 +5,10 @@ import { CreateScholarshipDto } from './dto/create-scholarship.dto.js';
 import { UpdateScholarshipDto } from './dto/update-scholarship.dto.js';
 import { ScholarshipsQueryDto } from './dto/scholarships-query.dto.js';
 import { Scholarship } from './entities/scholarship.entity.js';
+import {
+    PG_FOREIGN_KEY_VIOLATION,
+    toConflictIfPgCode,
+} from '../common/db-errors.js';
 
 @Injectable()
     export class ScholarshipsService {
@@ -85,7 +89,15 @@ import { Scholarship } from './entities/scholarship.entity.js';
     }
     async remove(id: number) {
         const scholarship = await this.findOne(id);
-        await this.scholarshipsRepository.remove(scholarship);
+        try {
+            await this.scholarshipsRepository.remove(scholarship);
+        } catch (error) {
+            throw toConflictIfPgCode(
+                error,
+                PG_FOREIGN_KEY_VIOLATION,
+                'No se puede eliminar: la beca tiene solicitudes asociadas',
+            );
+        }
         return scholarship;
     }
 }

@@ -5,6 +5,11 @@ import { Student } from './entities/students.entity.js';
 import { CreateStudentDto } from './dto/create-student.dto.js';
 import { UpdateStudentDto } from './dto/update-student.dto.js';
 import { StudentsQueryDto } from './dto/students-query.dto.js';
+import {
+    PG_FOREIGN_KEY_VIOLATION,
+    PG_UNIQUE_VIOLATION,
+    toConflictIfPgCode,
+} from '../common/db-errors.js';
 
 @Injectable()
 export class StudentsService {
@@ -14,7 +19,15 @@ export class StudentsService {
     ) {}
     async create(dto: CreateStudentDto) {
         const student = this.studentsRepository.create(dto);
-        return this.studentsRepository.save(student);
+        try {
+            return await this.studentsRepository.save(student);
+        } catch (error) {
+            throw toConflictIfPgCode(
+                error,
+                PG_UNIQUE_VIOLATION,
+                'Ya existe un estudiante con ese correo',
+            );
+        }
     }
     async findAll(query: StudentsQueryDto) {
         const {
@@ -90,13 +103,29 @@ export class StudentsService {
     async update(id: number, dto: UpdateStudentDto) {
         const student = await this.findOne(id);
         Object.assign(student, dto);
-        return this.studentsRepository.save(student);
+        try {
+            return await this.studentsRepository.save(student);
+        } catch (error) {
+            throw toConflictIfPgCode(
+                error,
+                PG_UNIQUE_VIOLATION,
+                'Ya existe un estudiante con ese correo',
+            );
+        }
     }
     async remove(id: number) {
         const student = await this.findOne(id);
-        await this.studentsRepository.remove(student);
+        try {
+            await this.studentsRepository.remove(student);
+        } catch (error) {
+            throw toConflictIfPgCode(
+                error,
+                PG_FOREIGN_KEY_VIOLATION,
+                'No se puede eliminar: el estudiante tiene solicitudes asociadas',
+            );
+        }
         return {
-        message: 'Estudiante eliminado correctamente',
+            message: 'Estudiante eliminado correctamente',
         };
     }
 }

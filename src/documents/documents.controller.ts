@@ -1,5 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RolesGuard } from '../auth/guards/roles.guard.js';
+import { Roles } from '../auth/decorators/roles.decorator.js';
+import { UserRole } from '../users/user-role.enum.js';
 import { DocumentsService } from './documents.service.js';
 import { CreateDocumentDto } from './dto/create-document.dto.js';
 import { DocumentsQueryDto } from './dto/documents-query.dto.js';
@@ -32,13 +35,15 @@ export class DocumentsController {
     return this.documentsService.findOne(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.REVIEWER)
   @Patch(':id')
   update(@Param('id', ParseDocumentIdPipe) id: number, @Body() updateDocumentDto: UpdateDocumentDto) {
     return this.documentsService.update(id, updateDocumentDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.REVIEWER)
   @Patch(':id/status')
   updateStatus(
     @Param('id', ParseDocumentIdPipe) id: number,
@@ -47,7 +52,8 @@ export class DocumentsController {
     return this.documentsService.updateStatus(id, dto.status);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.REVIEWER)
   @Delete(':id')
   remove(@Param('id', ParseDocumentIdPipe) id: number) {
     return this.documentsService.remove(id);

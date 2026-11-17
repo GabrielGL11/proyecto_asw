@@ -4,6 +4,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ApplicationsController } from './applications.controller.js';
 import { ApplicationsService } from './applications.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { UpdateApplicationUseCase } from './use-cases/update-application.use-case.js';
 
 describe('ApplicationsController', () => {
   let controller: ApplicationsController;
@@ -20,10 +21,13 @@ describe('ApplicationsController', () => {
             findOne: vi.fn(),
             findByStudent: vi.fn(),
             findByScholarship: vi.fn(),
-            update: vi.fn(),
             updateStatus: vi.fn(),
             remove: vi.fn(),
           },
+        },
+        {
+          provide: UpdateApplicationUseCase,
+          useValue: { execute: vi.fn() },
         },
       ],
     })

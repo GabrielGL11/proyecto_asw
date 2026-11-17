@@ -162,6 +162,21 @@ describe('ApplicationsService', () => {
     });
   });
 
+  it('should store the authenticated user as the owner of the application', async () => {
+    studentsRepository.findOne.mockResolvedValue(studentMock);
+    scholarshipsRepository.findOne.mockResolvedValue(scholarshipMock);
+    applicationsRepository.findOne.mockResolvedValue(null);
+
+    await service.create(
+      { studentId: 1, scholarshipId: 2, gpa: 8.7, income: 1400 },
+      7,
+    );
+
+    expect(applicationsRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ createdByUserId: 7, status: 'pendiente' }),
+    );
+  });
+
   it('should throw NotFoundException when the student does not exist', async () => {
     studentsRepository.findOne.mockResolvedValue(null);
 
@@ -280,29 +295,6 @@ describe('ApplicationsService', () => {
         scholarship: true,
       },
     });
-  });
-
-  it('should update an application', async () => {
-    applicationsRepository.findOne.mockResolvedValue({
-      ...applicationMock,
-    });
-
-    const result = await service.update(1, {
-      comment: 'Documentación actualizada',
-    });
-
-    expect(result.comment).toBe('Documentación actualizada');
-    expect(applicationsRepository.save).toHaveBeenCalledTimes(1);
-  });
-
-  it('should throw NotFoundException when updating a nonexistent application', async () => {
-    applicationsRepository.findOne.mockResolvedValue(null);
-
-    await expect(
-      service.update(999, {
-        comment: 'Actualización',
-      }),
-    ).rejects.toThrow(NotFoundException);
   });
 
   it('should update the application status', async () => {

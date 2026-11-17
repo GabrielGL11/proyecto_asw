@@ -5,7 +5,6 @@ import { Application } from './entities/application.entity.js';
 import { Student } from '../students/entities/students.entity.js';
 import { Scholarship } from '../scholarships/entities/scholarship.entity.js';
 import { CreateApplicationDto } from './dto/create-application.dto.js';
-import { UpdateApplicationDto } from './dto/update-application.dto.js';
 import { ApplicationsQueryDto } from './dto/applications-query.dto.js';
 
 @Injectable()
@@ -18,7 +17,7 @@ import { ApplicationsQueryDto } from './dto/applications-query.dto.js';
       @InjectRepository(Scholarship)
       private readonly scholarshipsRepository: Repository<Scholarship>,
     ) {}
-    async create(dto: CreateApplicationDto) {
+    async create(dto: CreateApplicationDto, actorId?: number) {
       const student = await this.studentsRepository.findOne({
         where: { id: dto.studentId },
       });
@@ -52,6 +51,7 @@ import { ApplicationsQueryDto } from './dto/applications-query.dto.js';
         student,
         scholarship,
         status: 'pendiente',
+        ...(actorId !== undefined ? { createdByUserId: actorId } : {}),
       });
       return this.applicationsRepository.save(application);
     }
@@ -158,11 +158,6 @@ import { ApplicationsQueryDto } from './dto/applications-query.dto.js';
           scholarship: true,
         },
       });
-    }
-    async update(id: number, dto: UpdateApplicationDto) {
-      const application = await this.findOne(id);
-      Object.assign(application, dto);
-      return this.applicationsRepository.save(application);
     }
     async updateStatus(id: number, status: string) {
       const validStatuses = [

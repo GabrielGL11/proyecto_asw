@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -179,5 +179,13 @@ describe('ScholarshipsService', () => {
       'scholarship.name',
       'ASC',
     );
+  });
+
+  it('should throw ConflictException when deleting a scholarship with applications', async () => {
+    vi.mocked(repository.remove).mockRejectedValueOnce(
+      Object.assign(new Error('foreign key violation'), { code: '23503' }),
+    );
+
+    await expect(service.remove(1)).rejects.toThrow(ConflictException);
   });
 });
