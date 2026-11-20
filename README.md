@@ -2,9 +2,9 @@
 
 Backend desarrollado con **NestJS, TypeScript, TypeORM y PostgreSQL** para administrar los procesos de becas estudiantiles de la Universidad Laica Eloy Alfaro de Manabí (ULEAM).
 
-Proyecto académico de la asignatura **Desarrollo Backend Web con NestJS — Segunda Etapa**.
+Proyecto académico de la asignatura **Desarrollo Backend Web con NestJS — Tercera Etapa**.
 
-**Repositorio:** [https://github.com/GabrielGL11/proyecto_asw](https://github.com/GabrielGL11/proyecto_asw)
+**Repositorio:** https://github.com/GabrielGL11/proyecto_asw
 
 ---
 
@@ -34,6 +34,8 @@ El proyecto incorpora operaciones CRUD, validación de datos, manejo de errores 
 - Proteger las operaciones de escritura mediante autenticación JWT.
 - Gestionar los cambios de estructura de la base de datos mediante migraciones.
 - Validar los datos recibidos y responder con códigos HTTP apropiados.
+- Implementar autorización basada en roles y propiedad de recursos.
+- Verificar las reglas de negocio mediante pruebas unitarias y pruebas de integración E2E.
 
 ## 3. Etapas del proyecto
 
@@ -76,7 +78,7 @@ Se incorporaron las funcionalidades de la segunda etapa:
 
 ### Etapa 3 — Autorización, seguridad y arquitectura
 
-Se incorporaron las funcionalidades de la tercera etapa (semanas 9 a 11):
+Se incorporaron las funcionalidades correspondientes a la tercera etapa (semanas 9 a 11):
 
 - JWT con `accessToken`, `GET /auth/me` e identidad segura en `req.user`.
 - Roles cerrados (`admin`, `reviewer`, `student`) con `RolesGuard` y `@Roles()`.
@@ -85,8 +87,11 @@ Se incorporaron las funcionalidades de la tercera etapa (semanas 9 a 11):
 - Middleware de registro, filtro global de errores e interceptor de tiempo.
 - Caso de uso con puerto de repositorio y adaptador TypeORM.
 - Respuestas `409` para correos duplicados y eliminaciones con solicitudes asociadas.
+- Pruebas unitarias con Jest y repositorios simulados.
+- Pruebas de integración HTTP con Jest y Supertest.
+- Configuración independiente para pruebas unitarias y E2E.
 
-Detalle en las secciones 19 y 20.
+La migración de las pruebas automatizadas de Vitest a Jest se registró en el commit `1cbd9de`.
 
 ## 4. Tecnologías utilizadas
 
@@ -106,7 +111,9 @@ Detalle en las secciones 19 y 20.
 | `@nestjs/passport` | Integración de Passport con NestJS |
 | `passport-jwt` | Estrategia JWT |
 | bcrypt | Hash de contraseñas |
-| Vitest | Pruebas automatizadas |
+| Jest | Framework de pruebas unitarias y E2E |
+| ts-jest | Transformación de archivos TypeScript para Jest |
+| Supertest | Pruebas de integración mediante peticiones HTTP |
 | Thunder Client | Pruebas manuales de la API |
 
 ## 5. Arquitectura del sistema
@@ -172,7 +179,7 @@ Verificación de contraseña con bcrypt
     ↓
 Generación de JWT
     ↓
-Cliente recibe access_token
+Cliente recibe accessToken
     ↓
 Authorization: Bearer <token>
     ↓
@@ -354,6 +361,7 @@ Campos principales:
 id
 email
 password
+role
 ```
 
 Características:
@@ -363,6 +371,7 @@ Características:
 - Registro de usuarios.
 - Inicio de sesión con validación de credenciales.
 - Generación de tokens JWT para la autenticación.
+- Asignación de roles para controlar los permisos.
 
 La entidad configura la contraseña para que no se seleccione en las consultas habituales de TypeORM, salvo cuando el servicio necesita recuperarla expresamente para verificar las credenciales.
 
@@ -541,7 +550,7 @@ app.useGlobalPipes(
 | `429 Too Many Requests` | Se superó el límite de solicitudes |
 | `500 Internal Server Error` | Error inesperado (sin detalles internos en la respuesta) |
 
-Todas las respuestas de error tienen la misma forma (filtro global `HttpErrorFilter`):
+Todas las respuestas de error tienen la misma forma mediante el filtro global `HttpErrorFilter`:
 
 ```json
 {
@@ -626,6 +635,7 @@ Entre las migraciones implementadas se encuentran:
 
 - `1791676800000-InitialSchema.ts`: crea el esquema inicial de estudiantes, becas, solicitudes, documentos y seguimiento.
 - `1791725363913-CreateUsersTable.ts`: crea la tabla de usuarios.
+- `AddRolesAndApplicationOwner`: incorpora los roles de usuario y la propiedad de las solicitudes.
 
 ### Comandos de migración
 
@@ -657,14 +667,14 @@ Los comandos deben ejecutarse con la configuración de base de datos correcta. A
 
 ### Verificación
 
-La ejecución de las dos migraciones se comprobó en una base de datos de prueba independiente. El historial mostró ambas migraciones como ejecutadas:
+La ejecución de las dos migraciones iniciales se comprobó en una base de datos de prueba independiente. El historial mostró ambas migraciones como ejecutadas:
 
 ```text
 [X] 1 InitialSchema1791676800000
 [X] 2 CreateUsersTable1791725363913
 ```
 
-Esta prueba permite comprobar que el esquema puede construirse desde cero mediante las migraciones, sin depender de `synchronize: true`.
+La migración `AddRolesAndApplicationOwner` corresponde a los cambios incorporados en la tercera etapa y debe aplicarse en el entorno correspondiente mediante `npm run migration:run`.
 
 ## 13. Registro y autenticación JWT
 
@@ -713,7 +723,11 @@ Con credenciales válidas, la API devuelve un token JWT y una representación se
 ```json
 {
   "accessToken": "<token_jwt>",
-  "user": { "id": 1, "email": "usuario@example.com", "role": "student" }
+  "user": {
+    "id": 1,
+    "email": "usuario@example.com",
+    "role": "student"
+  }
 }
 ```
 
@@ -733,50 +747,113 @@ Authorization: Bearer <token_jwt>
 
 ### Pruebas de autenticación realizadas
 
-Se comprobó el comportamiento de la API en los siguientes escenarios:
+Se contemplan los siguientes comportamientos:
 
 - Registro de usuarios.
 - Rechazo de correos duplicados.
 - Rechazo de credenciales incorrectas con `401 Unauthorized`.
 - Rechazo de solicitudes a rutas protegidas sin autenticación.
-- Creación autenticada de documentos.
-- Rechazo de solicitudes duplicadas con `409 Conflict`.
+- Rechazo de tokens inválidos.
+- Verificación de la identidad autenticada.
+- Comprobación de que la respuesta de autenticación no expone contraseñas.
 
-También se comprobó el rechazo de un token inválido con `401 Unauthorized`.
+Estos comportamientos también cuentan con cobertura mediante pruebas unitarias y escenarios E2E definidos.
 
 ## 14. Pruebas automatizadas y compilación
 
-El proyecto utiliza Vitest para ejecutar las pruebas automatizadas.
+El proyecto utiliza **Jest** como framework de pruebas automatizadas y **Supertest** para realizar pruebas de integración HTTP.
 
-Ejecutar las pruebas:
+La estrategia de pruebas se divide en pruebas unitarias y pruebas end-to-end (E2E).
+
+### 14.1. Pruebas unitarias
+
+Se implementaron pruebas unitarias con Jest para verificar los servicios, casos de uso, guards, filtros y controladores. Los repositorios se sustituyen por objetos simulados (*mocks*), lo que permite comprobar las reglas de negocio sin depender de una conexión real a PostgreSQL.
+
+La cobertura contempla operaciones CRUD, validaciones, reglas de integridad, permisos, propiedad de recursos y manejo de errores.
+
+| Módulo | Pruebas | Casos principales |
+|---|---:|---|
+| StudentsService | 13 | CRUD, filtros, paginación, correo duplicado y eliminación con solicitudes asociadas. |
+| ScholarshipsService | 10 | CRUD, filtros, paginación y restricciones de eliminación. |
+| ApplicationsService | 16 | Creación de solicitudes, estudiante inactivo, beca inexistente y solicitudes duplicadas. |
+| UpdateApplicationUseCase | 6 | Propiedad de solicitudes, permisos de administrador y revisor, errores 403 y 404. |
+| DocumentsService | 15 | Creación, validación de solicitudes, estados, filtros y paginación. |
+| TrackingService | 13 | Creación, ordenamiento por fecha, filtros y paginación. |
+| AuthService | 5 | Registro, hash de contraseñas, correos duplicados e inicio de sesión. |
+| RolesGuard | 4 | Autorización según los roles permitidos y usuario autenticado. |
+| HttpErrorFilter | 3 | Formato uniforme de errores, validaciones y ocultamiento de detalles internos. |
+| Controladores y AppController | 6 | Instanciación de controladores y respuesta principal de la API. |
+| **Total** | **91** | **15 archivos de prueba.** |
+
+**Configuración:**
+
+- `jest.config.mjs`: configuración de Jest para pruebas unitarias.
+- `ts-jest`: transformación de archivos TypeScript.
+- Los repositorios se simulan mediante mocks para aislar la lógica de negocio.
+
+Ejecutar las pruebas unitarias:
 
 ```bash
 npm test
 ```
 
-Ejecutarlas con detalle:
+### 14.2. Pruebas de integración E2E
+
+Se configuraron pruebas end-to-end mediante **Jest y Supertest**. Estas pruebas levantan la aplicación NestJS y realizan peticiones HTTP para comprobar el comportamiento de los endpoints, las validaciones y las respuestas del servidor.
+
+La configuración E2E es independiente de las pruebas unitarias:
+
+- `jest-e2e.config.mjs`: configuración de Jest para pruebas E2E.
+- `tsconfig.jest.json`: configuración de TypeScript para compilar las pruebas en CommonJS.
+- `Supertest`: permite enviar peticiones HTTP a la aplicación durante las pruebas.
+
+Ejecutar las pruebas E2E:
 
 ```bash
-npm test -- --reporter=verbose
+npm run test:e2e
 ```
 
-Resultado de la ejecución compartida:
+Actualmente se encuentra implementado y ejecutado el caso **CP-01**, correspondiente a la consulta `GET /`, que verifica que la API responda correctamente con código HTTP 200 y su página de bienvenida.
+
+Se definieron 33 escenarios de prueba (CP-01 a CP-33), organizados en los siguientes grupos:
+
+| Grupo | Casos | Escenarios contemplados |
+|---|---|---|
+| Raíz | CP-01 | Respuesta principal de la API. |
+| Validación | CP-02 a CP-07 | Registro, DTOs, parámetros inválidos y límites de paginación. |
+| Login | CP-08 a CP-12 | Inicio de sesión, credenciales inválidas, token JWT e identidad autenticada. |
+| Sin token | CP-13 a CP-16 | Rechazo de operaciones protegidas sin autenticación. |
+| Roles | CP-17 a CP-19 | Permisos de student, reviewer y admin, y administración de roles. |
+| CRUD estudiantes | CP-20 a CP-25 | Creación, consulta, actualización, paginación y eliminación. |
+| Solicitudes | CP-26 a CP-31 | Creación, duplicados, propiedad, actualización y cambios de estado. |
+| Integridad | CP-32 a CP-33 | Restricciones de eliminación y permisos sobre solicitudes asociadas. |
+
+**Importante:** Los escenarios CP-02 a CP-33 están definidos como casos previstos para ampliar la cobertura E2E, pero todavía están pendientes de implementación. No deben considerarse pruebas ejecutadas ni resultados aprobados.
+
+### 14.3. Resultados de ejecución
+
+Resultados de las ejecuciones realizadas:
 
 | Indicador | Resultado |
 |---|---:|
-| Archivos de prueba aprobados | 11 |
-| Pruebas aprobadas | 69 |
-| Pruebas fallidas | 0 |
+| Archivos de pruebas unitarias aprobados | 15 |
+| Pruebas unitarias aprobadas | 91 |
+| Pruebas unitarias fallidas | 0 |
+| Archivos de pruebas E2E aprobados | 1 |
+| Pruebas E2E aprobadas | 1 (CP-01) |
+| Pruebas E2E fallidas | 0 |
 
-También se comprobó la compilación del backend mediante:
+### 14.4. Compilación
+
+La compilación del proyecto se realiza mediante TypeScript y el comando:
 
 ```bash
 npm run build
 ```
 
-La ejecución compartida finalizó sin errores de compilación.
+El resultado de compilación debe registrarse después de ejecutar el comando y comprobar que finalice sin errores.
 
-Las pruebas manuales de los endpoints se realizaron mediante Thunder Client, mientras que las pruebas automatizadas permiten verificar los comportamientos implementados en los módulos y servicios.
+Las pruebas unitarias permiten verificar de manera aislada las reglas de negocio, mientras que las pruebas E2E comprueban la interacción HTTP con la aplicación. Ambas estrategias complementan las pruebas manuales realizadas con Thunder Client.
 
 ## 15. Instalación y ejecución
 
@@ -841,68 +918,86 @@ http://localhost:5500
 
 El puerto efectivo depende de la configuración de entorno utilizada.
 
+### Documentación Swagger
+
+Durante el desarrollo, la documentación de la API está disponible en:
+
+```text
+http://localhost:5500/api/docs
+```
+
+El puerto efectivo depende de la configuración del entorno.
+
 ## 16. Comandos de comprobación
 
 | Propósito | Comando |
 |---|---|
-| Compilar | `npm run build` |
-| Ejecutar pruebas | `npm test` |
-| Ejecutar pruebas detalladas | `npm test -- --reporter=verbose` |
-| Ejecutar pruebas end-to-end | `npm run test:e2e` |
-| Generar cobertura | `npm run test:cov` |
+| Iniciar en desarrollo | `npm run start:dev` |
+| Compilar el proyecto | `npm run build` |
+| Ejecutar pruebas unitarias | `npm test` |
+| Ejecutar pruebas unitarias con detalle | `npm test -- --verbose` |
+| Ejecutar pruebas E2E | `npm run test:e2e` |
 | Ejecutar migraciones | `npm run migration:run` |
 | Revertir última migración | `npm run migration:revert` |
 | Consultar migraciones | `npx typeorm-ts-node-esm migration:show -d src/data-source.ts` |
 
-Los comandos de pruebas end-to-end y cobertura dependen de la configuración y los scripts presentes en `package.json`.
+Las pruebas unitarias utilizan Jest y las pruebas E2E utilizan Jest junto con Supertest. La configuración de cada tipo de prueba se mantiene independiente.
 
 ## 17. Evidencias del proyecto
 
-Las evidencias se organizan por entrega en el repositorio:
+Las evidencias de las entregas se organizan en carpetas dentro del repositorio:
 
 ```text
 Evidencias/
 ├── Evidencias Entrega 1/
-└── Evidencias Entrega 2/
+├── Evidencias Entrega 2/
+└── Evidencias Entrega 3/
 ```
 
-Las evidencias de la segunda etapa incluyen capturas relacionadas con:
+Las evidencias de la tercera etapa incluyen capturas relacionadas con:
 
-- Modelo relacional y relaciones entre entidades.
-- Claves foráneas y restricciones.
-- Filtros, búsquedas, paginación y ordenamiento.
-- Configuración de TypeORM.
-- Ejecución de migraciones.
-- Registro de usuarios e inicio de sesión.
-- Protección de rutas mediante JWT.
-- Pruebas automatizadas.
+- Configuración de Jest para pruebas unitarias.
+- Ejecución de los 15 archivos de pruebas unitarias.
+- Resultado de las 91 pruebas unitarias aprobadas.
+- Configuración independiente de las pruebas E2E.
+- Ejecución del caso CP-01 mediante Jest y Supertest.
+- Configuración de autorización y roles.
+- Protección de rutas y propiedad de solicitudes.
+- Componentes transversales de seguridad.
+- Migración `AddRolesAndApplicationOwner`.
 - Compilación del backend.
-- Persistencia de datos en PostgreSQL.
 
-Repositorio de evidencias:
+Repositorio de evidencias de la tercera etapa:
 
-[https://github.com/GabrielGL11/proyecto_asw/tree/main/Evidencias/Evidencias%20Entrega%202](https://github.com/GabrielGL11/proyecto_asw/tree/main/Evidencias/Evidencias%20Entrega%202)
+https://github.com/GabrielGL11/proyecto_asw/tree/etapa3-autorizacion-seguridad/Evidencias/Evidencias%20Entrega%203
 
-Las capturas deben corresponder a resultados reales y no deben mostrar credenciales, contraseñas reales, secretos JWT ni tokens activos.
+Las capturas deben corresponder a ejecuciones reales y no deben mostrar credenciales, contraseñas, secretos JWT ni tokens activos.
 
 ## 18. Verificaciones realizadas antes de la entrega
 
-Antes de la entrega se confirmaron los siguientes puntos:
+Antes de la entrega de la tercera etapa se consideran las siguientes verificaciones:
 
 - [x] Relaciones entre las entidades principales.
 - [x] Claves foráneas y restricciones de integridad.
 - [x] Prevención de solicitudes duplicadas.
 - [x] Consultas con filtros, paginación y ordenamiento.
 - [x] Migraciones verificadas en una base de prueba independiente.
-- [x] Configuración de TypeORM con `synchronize: false` para la entrega.
-- [x] Registro, login y autenticación JWT implementados.
-- [x] Rutas de escritura protegidas mediante JWT.
-- [x] Pruebas automatizadas aprobadas según la ejecución compartida.
-- [x] Compilación sin errores según la ejecución compartida.
+- [x] Configuración de TypeORM con `synchronize: false`.
+- [x] Registro, login y autenticación JWT.
+- [x] Roles `admin`, `reviewer` y `student`.
+- [x] Protección de rutas mediante guards.
+- [x] Validación de propiedad de solicitudes.
+- [x] Manejo uniforme de errores HTTP.
+- [x] Migración de pruebas automatizadas de Vitest a Jest.
+- [x] 15 archivos de pruebas unitarias aprobados.
+- [x] 91 pruebas unitarias aprobadas.
+- [x] Configuración independiente para pruebas E2E.
+- [x] Caso E2E CP-01 implementado y aprobado.
+- [ ] Implementación de los escenarios E2E CP-02 a CP-33.
+- [ ] Verificación final de compilación mediante `npm run build`.
 - [x] Archivo `.env` excluido del repositorio.
 - [x] Tabla de endpoints contrastada con los controladores y guards.
-- [x] Revisar que los comandos documentados coincidan con la versión actual de `package.json`.
-- [x] Revisar el estado final de Git antes de realizar el commit y el push.
+- [x] Documentación de instalación, configuración y ejecución actualizada.
 
 ## 19. Autorización y seguridad (Etapa 3)
 
@@ -930,7 +1025,11 @@ El rol **nunca** se acepta en el registro: `POST /auth/register` rechaza cualqui
 
 ### Propiedad de recursos
 
-`POST /applications` guarda en `createdByUserId` el id del usuario autenticado (nunca se toma del cuerpo). `UpdateApplicationUseCase` permite modificar una solicitud solo a un administrador, un revisor o a su propietario; en otro caso lanza `403`. Las solicitudes creadas antes de esta etapa no tienen propietario y solo las modifican `admin` y `reviewer`.
+`POST /applications` guarda en `createdByUserId` el id del usuario autenticado (nunca se toma del cuerpo).
+
+`UpdateApplicationUseCase` permite modificar una solicitud solo a un administrador, un revisor o a su propietario; en otro caso lanza `403`.
+
+Las solicitudes creadas antes de esta etapa no tienen propietario y solo las modifican `admin` y `reviewer`.
 
 ### Crear el primer administrador
 
@@ -942,15 +1041,23 @@ UPDATE users SET role = 'admin' WHERE email = 'admin@example.com';
 
 ### CORS
 
-`app.enableCors` admite únicamente los orígenes de `CORS_ORIGINS`, los métodos `GET, POST, PATCH, DELETE` y los encabezados `Content-Type` y `Authorization`. CORS **no** es autorización: no impide llamadas desde Postman, Thunder Client o un servidor; por eso JWT y roles se siguen exigiendo.
+`app.enableCors` admite únicamente los orígenes de `CORS_ORIGINS`, los métodos `GET, POST, PATCH, DELETE` y los encabezados `Content-Type` y `Authorization`.
+
+CORS **no** es autorización: no impide llamadas desde Postman, Thunder Client o un servidor; por eso JWT y roles se siguen exigiendo.
 
 ### Limitación de solicitudes
 
-`@nestjs/throttler` aplica un límite global de 60 solicitudes por minuto por IP y uno más estricto en `POST /auth/login`: 5 por minuto. El sexto intento recibe `429 Too Many Requests` sin revelar si el correo o la contraseña eran correctos.
+`@nestjs/throttler` aplica un límite global de 60 solicitudes por minuto por IP y uno más estricto en `POST /auth/login`: 5 por minuto.
+
+El sexto intento recibe `429 Too Many Requests` sin revelar si el correo o la contraseña eran correctos.
 
 ### HTTPS / TLS (requisito de producción)
 
-En desarrollo se usa `http://localhost`. **En producción la API debe servirse únicamente por HTTPS/TLS**, normalmente con terminación TLS en un proxy, balanceador o la plataforma de despliegue. Sin HTTPS un token Bearer puede ser interceptado aunque su firma sea válida. Los secretos (`JWT_SECRET`, credenciales de base de datos) viven solo en variables de entorno del servidor y nunca en el repositorio.
+En desarrollo se usa `http://localhost`. **En producción la API debe servirse únicamente por HTTPS/TLS**, normalmente con terminación TLS en un proxy, balanceador o la plataforma de despliegue.
+
+Sin HTTPS un token Bearer puede ser interceptado aunque su firma sea válida.
+
+Los secretos (`JWT_SECRET`, credenciales de base de datos) viven solo en variables de entorno del servidor y nunca en el repositorio.
 
 ## 20. Arquitectura y componentes transversales (Etapa 3)
 
@@ -983,15 +1090,27 @@ PostgreSQL
 
 ### Migración de la etapa
 
-`AddRolesAndApplicationOwner` crea el tipo `users_role_enum`, la columna `users.role` (por defecto `student`) y `applications.createdByUserId` con su clave foránea (`ON DELETE SET NULL`). Aplicar con `npm run migration:run`.
+`AddRolesAndApplicationOwner` crea el tipo `users_role_enum`, la columna `users.role` (por defecto `student`) y `applications.createdByUserId` con su clave foránea (`ON DELETE SET NULL`).
 
-### Verificaciones de la Etapa 3 (completar tras ejecutar)
+Aplicar con:
 
-- [ ] `npm install @nestjs/throttler` ejecutado y `package.json`/`package-lock.json` actualizados.
-- [ ] `npm run migration:run` aplicado en la base local.
-- [ ] `npm test` y `npm run build` sin errores.
-- [ ] Demostración de la matriz de acceso (ver `docs/ETAPA_3_DEMOSTRACION.md`).
-- [ ] Evidencias guardadas en `Evidencias/Evidencias Entrega 3/`.
+```bash
+npm run migration:run
+```
+
+### Verificaciones de la Etapa 3
+
+- [x] Configuración de roles y autorización.
+- [x] Validación de propiedad de solicitudes.
+- [x] Componentes transversales implementados.
+- [x] Migración de pruebas de Vitest a Jest.
+- [x] 91 pruebas unitarias aprobadas.
+- [x] Configuración de pruebas E2E con Jest y Supertest.
+- [x] Caso CP-01 ejecutado correctamente.
+- [ ] Implementación de los escenarios E2E CP-02 a CP-33.
+- [ ] Comprobación final de compilación.
+- [ ] Aplicación de las migraciones pendientes en la base de datos de entrega.
+- [ ] Evidencias finales de la etapa incorporadas al repositorio.
 
 ## 21. Recursos oficiales
 
@@ -1003,6 +1122,8 @@ PostgreSQL
 - [Passport.js](https://www.passportjs.org/)
 - [Autenticación en NestJS](https://docs.nestjs.com/security/authentication)
 - [Documentación de Joi](https://joi.dev/api/)
+- [Documentación de Jest](https://jestjs.io/docs/getting-started)
+- [Documentación de Supertest](https://github.com/ladjs/supertest)
 
 ---
 
@@ -1018,8 +1139,8 @@ Proyecto académico desarrollado para la asignatura **Desarrollo Backend Web con
 - Anthony Gabriel Guaman Lucio
 - Jordan Josue Solorzano Zambrano
 
-**Carrera:** Software, 5.º “B”
+**Carrera:** Software, 5.º «B»
 
 **Docente:** Ing. Joffre Edgardo Panchana Flores, Mg.
 
-**Repositorio:** [https://github.com/GabrielGL11/proyecto_asw](https://github.com/GabrielGL11/proyecto_asw)
+**Repositorio:** https://github.com/GabrielGL11/proyecto_asw
