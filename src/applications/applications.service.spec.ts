@@ -1,4 +1,4 @@
-
+﻿
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   BadRequestException,
@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 
 import { ApplicationsService } from './applications.service.js';
 import { Application } from './entities/application.entity.js';
@@ -17,30 +17,30 @@ describe('ApplicationsService', () => {
   let service: ApplicationsService;
 
   let applicationsRepository: {
-    create: ReturnType<typeof vi.fn>;
-    save: ReturnType<typeof vi.fn>;
-    findOne: ReturnType<typeof vi.fn>;
-    find: ReturnType<typeof vi.fn>;
-    remove: ReturnType<typeof vi.fn>;
-    createQueryBuilder: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof jest.fn>;
+    save: ReturnType<typeof jest.fn>;
+    findOne: ReturnType<typeof jest.fn>;
+    find: ReturnType<typeof jest.fn>;
+    remove: ReturnType<typeof jest.fn>;
+    createQueryBuilder: ReturnType<typeof jest.fn>;
   };
 
   let studentsRepository: {
-    findOne: ReturnType<typeof vi.fn>;
+    findOne: ReturnType<typeof jest.fn>;
   };
 
   let scholarshipsRepository: {
-    findOne: ReturnType<typeof vi.fn>;
+    findOne: ReturnType<typeof jest.fn>;
   };
 
   let queryBuilderMock: {
-    leftJoinAndSelect: ReturnType<typeof vi.fn>;
-    andWhere: ReturnType<typeof vi.fn>;
-    orderBy: ReturnType<typeof vi.fn>;
-    addOrderBy: ReturnType<typeof vi.fn>;
-    skip: ReturnType<typeof vi.fn>;
-    take: ReturnType<typeof vi.fn>;
-    getManyAndCount: ReturnType<typeof vi.fn>;
+    leftJoinAndSelect: ReturnType<typeof jest.fn>;
+    andWhere: ReturnType<typeof jest.fn>;
+    orderBy: ReturnType<typeof jest.fn>;
+    addOrderBy: ReturnType<typeof jest.fn>;
+    skip: ReturnType<typeof jest.fn>;
+    take: ReturnType<typeof jest.fn>;
+    getManyAndCount: ReturnType<typeof jest.fn>;
   };
 
   const studentMock = {
@@ -53,7 +53,7 @@ describe('ApplicationsService', () => {
 
   const scholarshipMock = {
     id: 2,
-    name: 'Beca Excelencia Académica',
+    name: 'Beca Excelencia AcadÃ©mica',
   };
 
   const applicationMock = {
@@ -67,16 +67,16 @@ describe('ApplicationsService', () => {
   };
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
 
     queryBuilderMock = {
-      leftJoinAndSelect: vi.fn(),
-      andWhere: vi.fn(),
-      orderBy: vi.fn(),
-      addOrderBy: vi.fn(),
-      skip: vi.fn(),
-      take: vi.fn(),
-      getManyAndCount: vi.fn(),
+      leftJoinAndSelect: jest.fn(),
+      andWhere: jest.fn(),
+      orderBy: jest.fn(),
+      addOrderBy: jest.fn(),
+      skip: jest.fn(),
+      take: jest.fn(),
+      getManyAndCount: jest.fn(),
     };
 
     queryBuilderMock.leftJoinAndSelect.mockReturnValue(queryBuilderMock);
@@ -91,20 +91,20 @@ describe('ApplicationsService', () => {
     ]);
 
     applicationsRepository = {
-      create: vi.fn((data) => data),
-      save: vi.fn((data) => Promise.resolve(data)),
-      findOne: vi.fn(),
-      find: vi.fn(),
-      remove: vi.fn(),
-      createQueryBuilder: vi.fn().mockReturnValue(queryBuilderMock),
+      create: jest.fn((data) => data),
+      save: jest.fn((data) => Promise.resolve(data)),
+      findOne: jest.fn(),
+      find: jest.fn(),
+      remove: jest.fn(),
+      createQueryBuilder: jest.fn().mockReturnValue(queryBuilderMock),
     };
 
     studentsRepository = {
-      findOne: vi.fn(),
+      findOne: jest.fn(),
     };
 
     scholarshipsRepository = {
-      findOne: vi.fn(),
+      findOne: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({

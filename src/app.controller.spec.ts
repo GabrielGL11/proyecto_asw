@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { describe, it, expect, beforeEach } from 'vitest';
+﻿import { Test, TestingModule } from '@nestjs/testing';
+import { describe, it, expect, beforeEach } from '@jest/globals';
 
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';

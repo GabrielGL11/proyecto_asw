@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+﻿import { Test, TestingModule } from '@nestjs/testing';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 import { ApplicationsController } from './applications.controller.js';
 import { ApplicationsService } from './applications.service.js';
@@ -16,23 +16,23 @@ describe('ApplicationsController', () => {
         {
           provide: ApplicationsService,
           useValue: {
-            create: vi.fn(),
-            findAll: vi.fn(),
-            findOne: vi.fn(),
-            findByStudent: vi.fn(),
-            findByScholarship: vi.fn(),
-            updateStatus: vi.fn(),
-            remove: vi.fn(),
+            create: jest.fn(),
+            findAll: jest.fn(),
+            findOne: jest.fn(),
+            findByStudent: jest.fn(),
+            findByScholarship: jest.fn(),
+            updateStatus: jest.fn(),
+            remove: jest.fn(),
           },
         },
         {
           provide: UpdateApplicationUseCase,
-          useValue: { execute: vi.fn() },
+          useValue: { execute: jest.fn() },
         },
       ],
     })
       .overrideGuard(JwtAuthGuard)
-      .useValue({ canActivate: vi.fn(() => true) })
+      .useValue({ canActivate: jest.fn(() => true) })
       .compile();
 
     controller = module.get<ApplicationsController>(

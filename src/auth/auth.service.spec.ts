@@ -1,7 +1,7 @@
-import { ConflictException, UnauthorizedException } from '@nestjs/common';
+﻿import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { AuthService } from './auth.service.js';
 import { UsersService } from '../users/users.service.js';
 import { UserRole } from '../users/user-role.enum.js';
@@ -9,21 +9,21 @@ import { UserRole } from '../users/user-role.enum.js';
 describe('AuthService', () => {
   let service: AuthService;
   let usersService: {
-    findByEmail: ReturnType<typeof vi.fn>;
-    findByEmailWithPassword: ReturnType<typeof vi.fn>;
-    create: ReturnType<typeof vi.fn>;
+    findByEmail: ReturnType<typeof jest.fn>;
+    findByEmailWithPassword: ReturnType<typeof jest.fn>;
+    create: ReturnType<typeof jest.fn>;
   };
-  let jwtService: { signAsync: ReturnType<typeof vi.fn> };
+  let jwtService: { signAsync: ReturnType<typeof jest.fn> };
   let passwordHash: string;
 
   beforeEach(async () => {
     passwordHash = await bcrypt.hash('Prueba123!', 4);
     usersService = {
-      findByEmail: vi.fn(),
-      findByEmailWithPassword: vi.fn(),
-      create: vi.fn(),
+      findByEmail: jest.fn(),
+      findByEmailWithPassword: jest.fn(),
+      create: jest.fn(),
     };
-    jwtService = { signAsync: vi.fn().mockResolvedValue('signed.jwt.token') };
+    jwtService = { signAsync: jest.fn().mockResolvedValue('signed.jwt.token') };
     service = new AuthService(
       usersService as unknown as UsersService,
       jwtService as unknown as JwtService,

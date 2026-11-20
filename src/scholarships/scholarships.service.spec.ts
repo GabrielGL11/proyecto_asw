@@ -1,8 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
+﻿import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 
 import { ScholarshipsService } from './scholarships.service.js';
 import { Scholarship } from './entities/scholarship.entity.js';
@@ -13,7 +13,7 @@ describe('ScholarshipsService', () => {
 
   const scholarshipMock = {
     id: 1,
-    name: 'Beca Excelencia Académica',
+    name: 'Beca Excelencia AcadÃ©mica',
     description: 'Apoyo para estudiantes con buen rendimiento',
     amount: 500,
     startDate: new Date('2026-01-01'),
@@ -22,16 +22,16 @@ describe('ScholarshipsService', () => {
   };
 
   const queryBuilderMock = {
-    andWhere: vi.fn(),
-    orderBy: vi.fn(),
-    addOrderBy: vi.fn(),
-    skip: vi.fn(),
-    take: vi.fn(),
-    getManyAndCount: vi.fn(),
+    andWhere: jest.fn(),
+    orderBy: jest.fn(),
+    addOrderBy: jest.fn(),
+    skip: jest.fn(),
+    take: jest.fn(),
+    getManyAndCount: jest.fn(),
   };
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
 
     queryBuilderMock.andWhere.mockReturnValue(queryBuilderMock);
     queryBuilderMock.orderBy.mockReturnValue(queryBuilderMock);
@@ -49,13 +49,13 @@ describe('ScholarshipsService', () => {
         {
           provide: getRepositoryToken(Scholarship),
           useValue: {
-            create: vi.fn().mockImplementation((dto) => ({ ...dto })),
-            save: vi.fn().mockImplementation((scholarship) =>
+            create: jest.fn().mockImplementation((dto) => ({ ...dto })),
+            save: jest.fn().mockImplementation((scholarship) =>
               Promise.resolve(scholarship),
             ),
-            findOneBy: vi.fn().mockResolvedValue({ ...scholarshipMock }),
-            remove: vi.fn().mockResolvedValue(scholarshipMock),
-            createQueryBuilder: vi.fn().mockReturnValue(queryBuilderMock),
+            findOneBy: jest.fn().mockResolvedValue({ ...scholarshipMock }),
+            remove: jest.fn().mockResolvedValue(scholarshipMock),
+            createQueryBuilder: jest.fn().mockReturnValue(queryBuilderMock),
           },
         },
       ],
@@ -73,8 +73,8 @@ describe('ScholarshipsService', () => {
 
   it('should create a scholarship', async () => {
     const dto = {
-      name: 'Beca Excelencia Académica',
-      description: 'Apoyo académico',
+      name: 'Beca Excelencia AcadÃ©mica',
+      description: 'Apoyo acadÃ©mico',
       amount: 500,
       startDate: '2026-01-01',
       endDate: '2026-12-31',
@@ -96,7 +96,7 @@ describe('ScholarshipsService', () => {
   });
 
   it('should throw NotFoundException when the scholarship does not exist', async () => {
-    vi.mocked(repository.findOneBy).mockResolvedValueOnce(null);
+    jest.mocked(repository.findOneBy).mockResolvedValueOnce(null);
 
     await expect(service.findOne(999)).rejects.toThrow(
       NotFoundException,
@@ -117,7 +117,7 @@ describe('ScholarshipsService', () => {
   });
 
   it('should throw NotFoundException when updating a nonexistent scholarship', async () => {
-    vi.mocked(repository.findOneBy).mockResolvedValueOnce(null);
+    jest.mocked(repository.findOneBy).mockResolvedValueOnce(null);
 
     await expect(
       service.update(999, { name: 'Beca inexistente' }),
@@ -182,7 +182,7 @@ describe('ScholarshipsService', () => {
   });
 
   it('should throw ConflictException when deleting a scholarship with applications', async () => {
-    vi.mocked(repository.remove).mockRejectedValueOnce(
+    jest.mocked(repository.remove).mockRejectedValueOnce(
       Object.assign(new Error('foreign key violation'), { code: '23503' }),
     );
 

@@ -1,8 +1,8 @@
-
+﻿
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 import { TrackingService } from './tracking.service.js';
 import { Tracking } from './entities/tracking.entity.js';
@@ -18,34 +18,34 @@ describe('TrackingService', () => {
     applicationId: 10,
     application: applicationMock,
     status: 'revision',
-    comment: 'Solicitud en revisión',
+    comment: 'Solicitud en revisiÃ³n',
     createdAt: '2026-10-11T12:00:00.000Z',
   };
 
   const queryBuilderMock = {
-    andWhere: vi.fn(),
-    orderBy: vi.fn(),
-    addOrderBy: vi.fn(),
-    skip: vi.fn(),
-    take: vi.fn(),
-    getManyAndCount: vi.fn(),
+    andWhere: jest.fn(),
+    orderBy: jest.fn(),
+    addOrderBy: jest.fn(),
+    skip: jest.fn(),
+    take: jest.fn(),
+    getManyAndCount: jest.fn(),
   };
 
   const trackingRepository = {
-    create: vi.fn(),
-    save: vi.fn(),
-    find: vi.fn(),
-    findOne: vi.fn(),
-    remove: vi.fn(),
-    createQueryBuilder: vi.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
+    find: jest.fn(),
+    findOne: jest.fn(),
+    remove: jest.fn(),
+    createQueryBuilder: jest.fn(),
   };
 
   const applicationsRepository = {
-    findOne: vi.fn(),
+    findOne: jest.fn(),
   };
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
 
     queryBuilderMock.andWhere.mockReturnValue(queryBuilderMock);
     queryBuilderMock.orderBy.mockReturnValue(queryBuilderMock);
@@ -90,7 +90,7 @@ describe('TrackingService', () => {
     const dto = {
       applicationId: 10,
       status: 'revision',
-      comment: 'Solicitud en revisión',
+      comment: 'Solicitud en revisiÃ³n',
     };
 
     const result = await service.create(dto);
@@ -221,7 +221,7 @@ describe('TrackingService', () => {
 
   it('should apply search, application and status filters', async () => {
     await service.findAll({
-      search: 'revisión',
+      search: 'revisiÃ³n',
       applicationId: 10,
       status: 'revision',
       page: 2,
@@ -232,7 +232,7 @@ describe('TrackingService', () => {
 
     expect(queryBuilderMock.andWhere).toHaveBeenCalledWith(
       expect.stringContaining('tracking.status ILIKE :search'),
-      { search: '%revisión%' },
+      { search: '%revisiÃ³n%' },
     );
     expect(queryBuilderMock.andWhere).toHaveBeenCalledWith(
       'tracking.applicationId = :applicationId',

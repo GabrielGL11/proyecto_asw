@@ -1,12 +1,12 @@
-import { ExecutionContext } from '@nestjs/common';
+﻿import { ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { RolesGuard } from './roles.guard.js';
 import { UserRole } from '../../users/user-role.enum.js';
 
 describe('RolesGuard', () => {
   let guard: RolesGuard;
-  let reflector: { getAllAndOverride: ReturnType<typeof vi.fn> };
+  let reflector: { getAllAndOverride: ReturnType<typeof jest.fn> };
 
   const contextFor = (user?: { id: number; role: UserRole }) =>
     ({
@@ -16,7 +16,7 @@ describe('RolesGuard', () => {
     }) as unknown as ExecutionContext;
 
   beforeEach(() => {
-    reflector = { getAllAndOverride: vi.fn() };
+    reflector = { getAllAndOverride: jest.fn() };
     guard = new RolesGuard(reflector as unknown as Reflector);
   });
 

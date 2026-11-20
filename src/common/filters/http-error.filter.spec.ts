@@ -1,23 +1,23 @@
-import {
+﻿import {
   ArgumentsHost,
   BadRequestException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { HttpErrorFilter } from './http-error.filter.js';
 
 describe('HttpErrorFilter', () => {
   let filter: HttpErrorFilter;
-  let json: ReturnType<typeof vi.fn>;
-  let status: ReturnType<typeof vi.fn>;
+  let json: ReturnType<typeof jest.fn>;
+  let status: ReturnType<typeof jest.fn>;
   let host: ArgumentsHost;
 
   beforeEach(() => {
-    vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+    jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
     filter = new HttpErrorFilter();
-    json = vi.fn();
-    status = vi.fn().mockReturnValue({ json });
+    json = jest.fn();
+    status = jest.fn().mockReturnValue({ json });
     host = {
       switchToHttp: () => ({
         getResponse: () => ({ status }),
@@ -27,14 +27,14 @@ describe('HttpErrorFilter', () => {
   });
 
   it('keeps the status and message of an HttpException', () => {
-    filter.catch(new NotFoundException('No se encontró el estudiante'), host);
+    filter.catch(new NotFoundException('No se encontrÃ³ el estudiante'), host);
 
     expect(status).toHaveBeenCalledWith(404);
     const body = json.mock.calls[0][0];
     expect(body).toMatchObject({
       statusCode: 404,
       error: 'Not Found',
-      message: 'No se encontró el estudiante',
+      message: 'No se encontrÃ³ el estudiante',
       path: '/students/999',
     });
     expect(typeof body.timestamp).toBe('string');

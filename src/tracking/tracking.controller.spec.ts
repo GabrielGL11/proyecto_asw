@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+﻿import { Test, TestingModule } from '@nestjs/testing';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { TrackingController } from './tracking.controller.js';
 import { TrackingService } from './tracking.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
@@ -14,18 +14,18 @@ describe('TrackingController', () => {
         {
           provide: TrackingService,
           useValue: {
-            create: vi.fn(),
-            findAll: vi.fn(),
-            findOne: vi.fn(),
-            update: vi.fn(),
-            remove: vi.fn(),
+            create: jest.fn(),
+            findAll: jest.fn(),
+            findOne: jest.fn(),
+            update: jest.fn(),
+            remove: jest.fn(),
           },
         },
       ],
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({
-        canActivate: vi.fn(() => true),
+        canActivate: jest.fn(() => true),
       })
       .compile();
 

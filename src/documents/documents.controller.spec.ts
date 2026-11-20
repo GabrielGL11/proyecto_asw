@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+﻿import { Test, TestingModule } from '@nestjs/testing';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 import { DocumentsController } from './documents.controller.js';
 import { DocumentsService } from './documents.service.js';
@@ -15,18 +15,18 @@ describe('DocumentsController', () => {
         {
           provide: DocumentsService,
           useValue: {
-            create: vi.fn(),
-            findAll: vi.fn(),
-            findOne: vi.fn(),
-            update: vi.fn(),
-            updateStatus: vi.fn(),
-            remove: vi.fn(),
+            create: jest.fn(),
+            findAll: jest.fn(),
+            findOne: jest.fn(),
+            update: jest.fn(),
+            updateStatus: jest.fn(),
+            remove: jest.fn(),
           },
         },
       ],
     })
       .overrideGuard(JwtAuthGuard)
-      .useValue({ canActivate: vi.fn(() => true) })
+      .useValue({ canActivate: jest.fn(() => true) })
       .compile();
 
     controller = module.get<DocumentsController>(DocumentsController);

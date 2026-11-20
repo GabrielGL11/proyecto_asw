@@ -1,5 +1,5 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+﻿import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { UpdateApplicationUseCase } from './update-application.use-case.js';
 import type { ApplicationRepository } from '../domain/application.repository.js';
 import { UserRole } from '../../users/user-role.enum.js';
@@ -7,8 +7,8 @@ import { UserRole } from '../../users/user-role.enum.js';
 describe('UpdateApplicationUseCase', () => {
   let useCase: UpdateApplicationUseCase;
   let repository: {
-    findById: ReturnType<typeof vi.fn>;
-    save: ReturnType<typeof vi.fn>;
+    findById: ReturnType<typeof jest.fn>;
+    save: ReturnType<typeof jest.fn>;
   };
 
   const owner = { id: 10, email: 'owner@example.com', role: UserRole.STUDENT };
@@ -24,8 +24,8 @@ describe('UpdateApplicationUseCase', () => {
 
   beforeEach(() => {
     repository = {
-      findById: vi.fn(),
-      save: vi.fn((application) => Promise.resolve(application)),
+      findById: jest.fn(),
+      save: jest.fn((application) => Promise.resolve(application)),
     };
     useCase = new UpdateApplicationUseCase(
       repository as unknown as ApplicationRepository,

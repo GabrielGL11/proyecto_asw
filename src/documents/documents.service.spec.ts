@@ -1,11 +1,11 @@
-
+﻿
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 import { DocumentsService } from './documents.service.js';
 import { Document } from './entities/document.entity.js';
@@ -20,36 +20,36 @@ describe('DocumentsService', () => {
     id: 1,
     applicationId: 10,
     application: applicationMock,
-    name: 'Certificado de matrícula',
+    name: 'Certificado de matrÃ­cula',
     url: 'https://example.com/acta.pdf',
     status: 'pendiente',
   };
 
   const queryBuilderMock = {
-    leftJoinAndSelect: vi.fn(),
-    andWhere: vi.fn(),
-    orderBy: vi.fn(),
-    addOrderBy: vi.fn(),
-    skip: vi.fn(),
-    take: vi.fn(),
-    getManyAndCount: vi.fn(),
+    leftJoinAndSelect: jest.fn(),
+    andWhere: jest.fn(),
+    orderBy: jest.fn(),
+    addOrderBy: jest.fn(),
+    skip: jest.fn(),
+    take: jest.fn(),
+    getManyAndCount: jest.fn(),
   };
 
   const documentsRepository = {
-    create: vi.fn(),
-    save: vi.fn(),
-    find: vi.fn(),
-    findOne: vi.fn(),
-    remove: vi.fn(),
-    createQueryBuilder: vi.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
+    find: jest.fn(),
+    findOne: jest.fn(),
+    remove: jest.fn(),
+    createQueryBuilder: jest.fn(),
   };
 
   const applicationsRepository = {
-    findOne: vi.fn(),
+    findOne: jest.fn(),
   };
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
 
     queryBuilderMock.leftJoinAndSelect.mockReturnValue(queryBuilderMock);
     queryBuilderMock.andWhere.mockReturnValue(queryBuilderMock);
@@ -94,7 +94,7 @@ describe('DocumentsService', () => {
 
     const dto = {
       applicationId: 10,
-      name: 'Acta de matrícula',
+      name: 'Acta de matrÃ­cula',
       url: 'https://example.com/acta.pdf',
     };
 
@@ -199,7 +199,7 @@ describe('DocumentsService', () => {
     const result = await service.updateStatus(1, 'observado');
 
     expect(result.status).toBe('observado');
-    expect(result.name).toBe('Certificado de matrícula');
+    expect(result.name).toBe('Certificado de matrÃ­cula');
     expect(documentsRepository.save).toHaveBeenCalledTimes(1);
   });
 

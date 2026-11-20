@@ -1,8 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
+﻿import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 
 import { StudentsService } from './students.service.js';
 import { Student } from './entities/students.entity.js';
@@ -24,16 +24,16 @@ describe('StudentsService', () => {
   };
 
   const queryBuilderMock = {
-    andWhere: vi.fn(),
-    orderBy: vi.fn(),
-    addOrderBy: vi.fn(),
-    skip: vi.fn(),
-    take: vi.fn(),
-    getManyAndCount: vi.fn(),
+    andWhere: jest.fn(),
+    orderBy: jest.fn(),
+    addOrderBy: jest.fn(),
+    skip: jest.fn(),
+    take: jest.fn(),
+    getManyAndCount: jest.fn(),
   };
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
 
     queryBuilderMock.andWhere.mockReturnValue(queryBuilderMock);
     queryBuilderMock.orderBy.mockReturnValue(queryBuilderMock);
@@ -51,13 +51,13 @@ describe('StudentsService', () => {
         {
           provide: getRepositoryToken(Student),
           useValue: {
-            create: vi.fn().mockReturnValue({ ...studentMock }),
-            save: vi.fn().mockImplementation((student) =>
+            create: jest.fn().mockReturnValue({ ...studentMock }),
+            save: jest.fn().mockImplementation((student) =>
               Promise.resolve(student),
             ),
-            findOne: vi.fn().mockResolvedValue({ ...studentMock }),
-            remove: vi.fn().mockResolvedValue(studentMock),
-            createQueryBuilder: vi.fn().mockReturnValue(queryBuilderMock),
+            findOne: jest.fn().mockResolvedValue({ ...studentMock }),
+            remove: jest.fn().mockResolvedValue(studentMock),
+            createQueryBuilder: jest.fn().mockReturnValue(queryBuilderMock),
           },
         },
       ],
@@ -102,7 +102,7 @@ describe('StudentsService', () => {
   });
 
   it('should throw NotFoundException when the student does not exist', async () => {
-    vi.mocked(repository.findOne).mockResolvedValueOnce(null);
+    jest.mocked(repository.findOne).mockResolvedValueOnce(null);
 
     await expect(service.findOne(999)).rejects.toThrow(
       NotFoundException,
@@ -111,7 +111,7 @@ describe('StudentsService', () => {
 
   it('should update a student', async () => {
     const dto = {
-      career: 'Ingeniería de Software',
+      career: 'IngenierÃ­a de Software',
       semester: 6,
     };
 
@@ -125,7 +125,7 @@ describe('StudentsService', () => {
   });
 
   it('should throw NotFoundException when updating a nonexistent student', async () => {
-    vi.mocked(repository.findOne).mockResolvedValueOnce(null);
+    jest.mocked(repository.findOne).mockResolvedValueOnce(null);
 
     await expect(
       service.update(999, { career: 'Software' }),
@@ -188,7 +188,7 @@ describe('StudentsService', () => {
   });
 
   it('should throw ConflictException when creating a student with a duplicate email', async () => {
-    vi.mocked(repository.save).mockRejectedValueOnce(
+    jest.mocked(repository.save).mockRejectedValueOnce(
       Object.assign(new Error('duplicate key'), { code: '23505' }),
     );
 
@@ -207,7 +207,7 @@ describe('StudentsService', () => {
   });
 
   it('should rethrow unexpected errors when creating a student', async () => {
-    vi.mocked(repository.save).mockRejectedValueOnce(new Error('boom'));
+    jest.mocked(repository.save).mockRejectedValueOnce(new Error('boom'));
 
     await expect(
       service.create({
@@ -224,7 +224,7 @@ describe('StudentsService', () => {
   });
 
   it('should throw ConflictException when updating to a duplicate email', async () => {
-    vi.mocked(repository.save).mockRejectedValueOnce(
+    jest.mocked(repository.save).mockRejectedValueOnce(
       Object.assign(new Error('duplicate key'), { code: '23505' }),
     );
 
@@ -234,7 +234,7 @@ describe('StudentsService', () => {
   });
 
   it('should throw ConflictException when deleting a student with applications', async () => {
-    vi.mocked(repository.remove).mockRejectedValueOnce(
+    jest.mocked(repository.remove).mockRejectedValueOnce(
       Object.assign(new Error('foreign key violation'), { code: '23503' }),
     );
 
