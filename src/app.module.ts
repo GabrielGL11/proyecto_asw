@@ -53,7 +53,15 @@ import { UsersModule } from './users/users.module.js';
     }),
 
     // Límite global por IP: 60 solicitudes por minuto. El login es más estricto.
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 60 }]),
+    // THROTTLE_DISABLED=true solo lo usan las pruebas E2E (evita el 429 al
+    // iniciar sesión muchas veces); nunca debe activarse en producción.
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60_000,
+        limit: 60,
+        skipIf: () => process.env.THROTTLE_DISABLED === 'true',
+      },
+    ]),
 
     ScholarshipsModule,
     StudentsModule,

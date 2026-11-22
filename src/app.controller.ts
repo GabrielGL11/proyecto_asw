@@ -1,12 +1,16 @@
-import { Controller, Get } from '@nestjs/common'; // 1
-import { AppService } from './app.service.js'; // 2
+import { Controller, Get } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AppService } from './app.service.js';
 
-@Controller() // 3
-export class AppController { // 4
-  constructor(private readonly appService: AppService) {} // 5
+@ApiTags('Raíz')
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
 
-  @Get() // 6
-  getHello(): string { // 7
-    return this.appService.getHello(); // 8
+  @ApiOperation({ summary: 'Comprobar que la API responde' })
+  @ApiOkResponse({ description: 'Página de bienvenida (HTML)' })
+  @Get()
+  getHello(): string {
+    return this.appService.getHello();
   }
 }
