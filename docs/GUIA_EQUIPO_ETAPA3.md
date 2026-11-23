@@ -2,8 +2,11 @@
 
 Gabriel ya migró las pruebas a Jest (commit `1cbd9de`) y actualizó el README. Lo que falta son **Swagger** y las **pruebas E2E CP-02 a CP-35**, repartido en dos partes. Cada compañero aplica su zip, lo prueba y hace **sus propios commits** (la rúbrica pide commits atribuibles a cada integrante).
 
+> **Estado actual:** el **Compañero 1 ya subió su parte** y ya está en `main` (base común, Swagger de Auth y Users, y E2E CP-01 a CP-25 y CP-34). **Solo falta el Compañero 2.**
+
 | | Compañero 1 | Compañero 2 |
 |---|---|---|
+| **Estado** | ✅ **Ya subido** (ya está en `main`) | ⏳ **Pendiente** |
 | **Zip** | `COMPANERO_1_base_auth_roles.zip` | `COMPANERO_2_swagger_dominio_y_e2e.zip` |
 | **Base común** | `app.setup.ts`, Swagger, helpers y base `_test` | — (usa la base del Compañero 1) |
 | **Swagger** | Auth, Users y ruta raíz | Students, Scholarships, Applications, Documents, Tracking |
@@ -11,11 +14,11 @@ Gabriel ya migró las pruebas a Jest (commit `1cbd9de`) y actualizó el README. 
 
 ## Orden de trabajo
 
-1. **El Compañero 1 sube primero** (en unos 15 minutos): el Compañero 2 necesita sus archivos comunes para compilar.
-2. El Compañero 2 puede ir revisando y preparando sus archivos mientras tanto, pero hace `git pull` antes de `npm install`, de probar y de subir.
+1. ✅ **El Compañero 1 ya subió su parte.** Sus archivos comunes ya están en `main`; no tiene que hacer nada más.
+2. ⏳ **El Compañero 2 va ahora:** hace `git pull` (trae lo del Compañero 1) antes de `npm install`, de probar y de subir.
 3. Al final, Gabriel integra, corre todo y completa README y Word con resultados reales.
 
-## Pasos para cada compañero
+## Pasos para el Compañero 2 (el Compañero 1 ya los hizo)
 
 ```bash
 git checkout main
@@ -31,9 +34,11 @@ Haz los commits sugeridos, sube la rama (`git push -u origin <rama>`) y abre un 
 
 ---
 
-## Compañero 1 — Base, Auth y roles (va primero)
+## Compañero 1 — Base, Auth y roles ✅ YA SUBIDO
 
-Archivos: `package.json`, `jest-e2e.config.mjs`, `.env.example`, `CHANGELOG.md`, `src/app.setup.ts`, `src/swagger.setup.ts`, `src/main.ts`, `src/app.module.ts`, `src/common/dto/*`, `src/common/swagger/*`, `src/app.controller.ts`, `src/auth/*` (controlador y DTOs), `src/users/*` (controlador, DTO y entidad), `test/test-env.ts`, `test/setup-env.ts`, `test/helpers/*`, `test/app.e2e-spec.ts`, `test/throttle.e2e-spec.ts`, `test/roles-students.e2e-spec.ts`.
+> Esta parte **ya está en `main`**. Se conserva como referencia de lo que hizo; no hay que repetir nada.
+
+Archivos: `package.json`, `jest-e2e.config.mjs`, `.env.example`, `src/app.setup.ts`, `src/swagger.setup.ts`, `src/main.ts`, `src/app.module.ts`, `src/common/dto/*`, `src/common/swagger/*`, `src/app.controller.ts`, `src/auth/*` (controlador y DTOs), `src/users/*` (controlador, DTO y entidad), `test/test-env.ts`, `test/setup-env.ts`, `test/helpers/*`, `test/app.e2e-spec.ts`, `test/throttle.e2e-spec.ts`, `test/roles-students.e2e-spec.ts`.
 
 ```bash
 npm install                                  # instala @nestjs/swagger y actualiza package-lock.json
@@ -52,21 +57,21 @@ git commit -m "test(e2e): add Jest e2e setup with isolated _test database and he
 git add test/app.e2e-spec.ts test/throttle.e2e-spec.ts
 git commit -m "test(e2e): implement CP-01 to CP-16 and CP-34 (validation, login, no token, 429)"
 
-# >>> hasta aquí: git push y avisar al Compañero 2 <<<
+# >>> hasta aquí: git push (hecho) <<<
 
 git add src/app.controller.ts src/auth src/users
 git commit -m "docs(swagger): document root, auth and users endpoints"
 
 npm run test:e2e -- roles-students           # CP-17 a CP-25
-git add test/roles-students.e2e-spec.ts CHANGELOG.md
+git add test/roles-students.e2e-spec.ts
 git commit -m "test(e2e): implement CP-17 to CP-25 (roles and students CRUD)"
 ```
 
-## Compañero 2 — Swagger del dominio y E2E de solicitudes
+## Compañero 2 — Swagger del dominio y E2E de solicitudes ⏳ PENDIENTE (le toca ahora)
 
 Archivos: `src/students/*`, `src/scholarships/*`, `src/applications/*`, `src/documents/*`, `src/tracking/*` (solo controladores, DTOs y entidades), `test/applications.e2e-spec.ts`, `test/swagger.e2e-spec.ts`.
 
-Antes de probar: `git pull` con lo del Compañero 1 y `npm install`.
+Antes de probar: `git pull` (ya trae lo del Compañero 1, que está en `main`) y `npm install`.
 
 ```bash
 git add src/students src/scholarships
@@ -91,6 +96,8 @@ git commit -m "test(e2e): verify the OpenAPI contract (CP-35)"
 
 ## Cierre (Gabriel)
 
+El antiguo `CHANGELOG.md` se unió al `README.md` (sección 21, «Registro de cambios»); ya no existe como archivo aparte.
+
 Con ambas ramas fusionadas en `main`:
 
 ```bash
@@ -101,7 +108,7 @@ npm run test:e2e        # 35 casos E2E (5 archivos)
 npm run build           # compilación sin errores
 ```
 
-Después, **solo con los resultados reales**: completar la sección 14 del README y el Word (ver `docs/ACTUALIZAR_README_ETAPA3.md`) y guardar las capturas en `Evidencias/Evidencias Entrega 3/`.
+Después, **solo con los resultados reales**: completar la sección 14 del README y el Word y guardar las capturas en `Evidencias/Evidencias Entrega 3/`.
 
 ## Requisitos para las pruebas E2E
 
